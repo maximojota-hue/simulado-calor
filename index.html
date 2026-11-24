@@ -1,0 +1,3490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado — Calorimetria (Física, 2º ano)</title>
+<style>
+  :root{
+    --bg:#f5f6fa;
+    --card:#ffffff;
+    --ink:#1a1c23;
+    --muted:#6b7280;
+    --line:#e3e6ee;
+    --accent:#4f46e5;
+    --accent-soft:#eef0ff;
+    --ok:#15803d;
+    --ok-soft:#e9f8ef;
+    --ok-line:#b7e4c7;
+    --no:#b91c1c;
+    --no-soft:#fdecec;
+    --no-line:#f3bcbc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:840px;margin:0 auto;padding:28px 18px 80px}
+
+  header.top{margin-bottom:22px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(22px,3.4vw,30px);line-height:1.2;margin:6px 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+
+  .bar{
+    position:sticky;top:0;z-index:5;
+    background:rgba(245,246,250,.92);
+    backdrop-filter:blur(8px);
+    padding:12px 0 10px;margin:-4px 0 18px;
+    border-bottom:1px solid var(--line);
+  }
+  .bar-inner{max-width:840px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:14px}
+  .track{flex:1;height:7px;border-radius:99px;background:#e4e7f0;overflow:hidden}
+  .fill{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width .35s ease}
+  .count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .count b{color:var(--ink)}
+
+  .timer{
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;
+    padding:4px 10px;border-radius:9px;white-space:nowrap;
+    background:#fff;border:1.5px solid var(--line);color:var(--ink);
+  }
+  .timer::before{content:"⏱ ";font-size:12.5px;opacity:.5;font-weight:400}
+  .timer.warn{border-color:#efd08f;background:#fffaf0;color:#a16207}
+  .timer.danger{border-color:#f3bcbc;background:var(--no-soft);color:var(--no);animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .timer.hidden{display:none}
+
+  .start-rules{list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:10px}
+  .start-rules li{font-size:14.5px;line-height:1.5;color:#3b4051;padding-left:22px;position:relative}
+  .start-rules li::before{content:"›";position:absolute;left:5px;top:-1px;color:var(--accent);font-weight:800;font-size:17px}
+  .big{font-size:16px;padding:15px 28px;width:100%}
+  .banner{
+    margin:0 0 16px;padding:11px 14px;border-radius:10px;
+    background:var(--no-soft);border:1px solid var(--no-line);color:var(--no);
+    font-size:14px;font-weight:600;
+  }
+  .meta-row{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 0;font-size:13.5px;color:var(--muted)}
+  .meta-row b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+  /* ---------- painel de registro de tentativas ---------- */
+  .log{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px 14px;margin:0 0 16px;box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .log-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .log-title{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .log-badges{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+  .badge{
+    font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;
+    background:#f0f2f8;color:#4b5060;white-space:nowrap;font-variant-numeric:tabular-nums;
+  }
+  .badge.zero{opacity:.45}
+  .badge.warn{background:#fff6e5;color:#a16207}
+  .badge.bad{background:var(--no-soft);color:var(--no)}
+  .badge.good{background:var(--ok-soft);color:var(--ok)}
+  .log-toggle{
+    font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;cursor:pointer;
+    background:#fff;border:1px solid var(--line);color:#4b5060;font-family:inherit;
+  }
+  .log-toggle:hover{border-color:#c3c8f5;color:var(--accent)}
+  .log-note{
+    margin:10px 0 0;font-size:13px;line-height:1.45;color:var(--no);
+    background:var(--no-soft);border:1px solid var(--no-line);border-radius:9px;padding:8px 11px;
+  }
+  .log-note b{font-variant-numeric:tabular-nums}
+  .log-list{
+    list-style:none;margin:11px 0 0;padding:0;display:flex;flex-direction:column;
+    gap:0;max-height:190px;overflow-y:auto;
+  }
+  .log-list[hidden]{display:none}
+  .log-list li{
+    display:flex;gap:9px;align-items:baseline;font-size:13px;line-height:1.4;
+    padding:7px 0;border-bottom:1px dashed #edf0f7;color:#3b4051;
+  }
+  .log-list li:last-child{border-bottom:0}
+  .log-time{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--muted);flex:0 0 auto}
+  .log-tipo{font-weight:700;flex:0 0 auto}
+  .log-tipo.iniciou{color:var(--accent)}
+  .log-tipo.reiniciou{color:#a16207}
+  .log-tipo.interrompeu{color:var(--no)}
+  .log-tipo.concluiu{color:var(--ok)}
+  .log-tipo.tempo{color:var(--no)}
+  .log-nota{color:var(--muted);font-size:12.5px}
+  .log-foot{display:flex;justify-content:flex-end;margin-top:11px}
+  .log-foot[hidden]{display:none}
+  .log-clear{
+    font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:7px;cursor:pointer;
+    background:none;border:1px solid var(--line);color:var(--muted);font-family:inherit;
+  }
+  .log-clear:hover{border-color:var(--no-line);color:var(--no)}
+
+  /* ---------- confirmacao antes de revelar ---------- */
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+  .opt.sel .key{background:var(--accent);color:#fff}
+  .confirm{
+    margin-top:16px;padding:14px 16px;border-radius:12px;
+    border:1.5px dashed var(--accent);background:#f8f9ff;animation:in .18s ease;
+  }
+  .confirm-q{font-size:14.5px;line-height:1.5;color:#33384a;margin:0 0 12px}
+  .confirm-q b{color:var(--ink)}
+  .confirm-q .pick{
+    display:block;margin-top:6px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+  }
+  .confirm-btns{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+  .confirm-btns .btn{padding:9px 18px;font-size:14.5px}
+  .danger-btn{background:var(--no);border-color:var(--no)}
+  .danger-btn:hover{background:#991b1b}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px 24px 20px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -18px rgba(16,24,40,.18);
+  }
+  .chip{
+    display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 10px;border-radius:99px;margin-bottom:14px;
+  }
+  .q{font-size:17.5px;line-height:1.6;margin:0 0 6px;font-weight:500}
+  .q strong{font-weight:700}
+
+  .formula{
+    font-family:"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+    font-size:15px;line-height:1.45;
+    background:#f8f9fc;border:1px dashed #d6dae7;border-radius:10px;
+    padding:14px 16px;margin:14px 0 4px;
+    white-space:pre;overflow-x:auto;color:#242736;
+  }
+  .formula .lbl{display:block;font-family:inherit;font-size:11.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+
+  /* ---------- figura (diagrama SVG da questao/aula) ---------- */
+  .figura{
+    margin:16px 0 4px;padding:14px 12px 10px;
+    background:#fbfcff;border:1px solid var(--line);border-radius:12px;
+    text-align:center;
+  }
+  .figura svg{max-width:100%;height:auto;display:block;margin:0 auto}
+  .figura .cap{
+    display:block;margin-top:9px;font-size:12.5px;line-height:1.5;
+    color:var(--muted);text-align:center;
+  }
+  .lesson-body .figura{margin:0 0 16px}
+
+  /* ---------- botao "aprender o assunto" ---------- */
+  .lesson-btn{
+    display:flex;align-items:center;gap:9px;width:100%;
+    margin-top:14px;padding:12px 15px;
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    color:#fff;border:0;border-radius:11px;cursor:pointer;
+    font-family:inherit;font-size:14.5px;font-weight:700;text-align:left;
+    box-shadow:0 2px 10px -3px rgba(79,70,229,.5);
+    transition:transform .08s,box-shadow .15s;
+  }
+  .lesson-btn:hover{box-shadow:0 4px 16px -3px rgba(79,70,229,.6)}
+  .lesson-btn:active{transform:scale(.994)}
+  .lesson-btn .ico{
+    flex:0 0 26px;height:26px;border-radius:8px;
+    background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:14px;
+  }
+  .lesson-btn .lbl{flex:1;min-width:0}
+  .lesson-btn .lbl small{display:block;font-weight:500;opacity:.85;font-size:12px;margin-top:1px}
+  .lesson-btn .arrow{opacity:.7;font-size:16px;flex:0 0 auto}
+
+  /* ---------- modal da aula ---------- */
+  .modal{
+    position:fixed;inset:0;z-index:60;display:none;
+    background:rgba(16,18,28,.55);backdrop-filter:blur(3px);
+    padding:24px 16px;overflow-y:auto;
+  }
+  .modal.open{display:block;animation:fadeIn .16s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .lesson{
+    max-width:720px;margin:0 auto;background:#fff;border-radius:16px;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.45);overflow:hidden;
+    animation:up .22s cubic-bezier(.2,.8,.3,1);
+  }
+  @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .lesson-head{
+    padding:20px 22px 16px;border-bottom:1px solid var(--line);
+    background:linear-gradient(135deg,#f5f4ff,#faf9ff);
+    display:flex;align-items:flex-start;gap:12px;
+  }
+  .lesson-head .eyebrow{
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);font-weight:800;margin:0 0 5px;
+  }
+  .lesson-head h2{
+    margin:0;font-size:19px;line-height:1.25;letter-spacing:-.01em;flex:1;
+  }
+  .lesson-close{
+    flex:0 0 32px;height:32px;border-radius:9px;border:1px solid #ddd9f5;
+    background:#fff;color:#5b5871;font-size:17px;cursor:pointer;line-height:1;
+    display:grid;place-items:center;font-family:inherit;
+  }
+  .lesson-close:hover{border-color:var(--accent);color:var(--accent)}
+  .lesson-body{padding:20px 22px 24px}
+  .lesson-resumo{
+    font-size:15px;line-height:1.6;color:#33384a;
+    background:#f7f8fc;border-left:3px solid var(--accent);
+    padding:12px 15px;border-radius:0 9px 9px 0;margin:0 0 20px;
+  }
+  .lesson-body h3{
+    font-size:14px;letter-spacing:.02em;text-transform:uppercase;
+    color:var(--accent);margin:24px 0 8px;font-weight:800;
+  }
+  .lesson-body h3:first-of-type{margin-top:0}
+  .lesson-body p{font-size:15px;line-height:1.65;color:#2f3444;margin:0 0 12px}
+  .lesson-body ul{margin:0 0 14px;padding-left:20px}
+  .lesson-body li{font-size:15px;line-height:1.6;color:#2f3444;margin-bottom:7px}
+  .lesson-form{
+    font-family:"Cascadia Mono",Consolas,monospace;font-size:16px;font-weight:600;
+    background:#111827;color:#e5e7eb;border-radius:10px;
+    padding:14px 16px;margin:0 0 14px;text-align:center;overflow-x:auto;
+  }
+  .lesson-form .leg{
+    display:block;font-family:inherit;font-size:11.5px;font-weight:400;
+    color:#9ca3af;margin-top:7px;letter-spacing:.02em;
+  }
+  .lesson-hi{
+    background:#eef0ff;border:1px solid #d7d9f7;border-radius:10px;
+    padding:12px 14px;margin:0 0 14px;font-size:14.5px;line-height:1.55;
+    color:#3b3f57;font-weight:500;
+  }
+  .lesson-hi::before{content:"💡 ";font-weight:400}
+  .lesson-erros{
+    margin:6px 0 0;padding:14px 16px;background:var(--no-soft);
+    border:1px solid var(--no-line);border-radius:10px;
+  }
+  .lesson-erros .tit{
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--no);font-weight:800;margin:0 0 8px;
+  }
+  .lesson-erros ul{margin:0;padding-left:18px}
+  .lesson-erros li{font-size:14px;color:#7f1d1d;margin-bottom:5px;line-height:1.5}
+  .lesson-foot{
+    display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;
+    padding:16px 22px;border-top:1px solid var(--line);background:#fbfbfe;
+  }
+
+  .opts{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-direction:column;gap:10px}
+  .opt{
+    display:flex;gap:12px;align-items:flex-start;
+    border:1.5px solid var(--line);border-radius:12px;
+    padding:13px 15px;cursor:pointer;background:#fff;
+    transition:border-color .15s,background .15s,transform .06s;
+    font-size:15.5px;line-height:1.5;text-align:left;
+  }
+  .opt:hover:not(.locked){border-color:#c3c8f5;background:#fbfbff}
+  .opt:active:not(.locked){transform:scale(.997)}
+  .opt .key{
+    flex:0 0 26px;height:26px;border-radius:8px;background:#f0f2f8;color:#4b5060;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12.5px;font-weight:700;font-family:ui-monospace,monospace;
+  }
+  .opt .txt{flex:1}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-soft)}
+  .opt.correct .key{background:#cdeedd;color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-soft)}
+  .opt.wrong .key{background:#f8cfcf;color:var(--no)}
+  .opt.dim{opacity:.62}
+  .mark{font-weight:800;margin-left:auto;flex:0 0 auto;font-size:15px}
+  .opt.correct .mark{color:var(--ok)}
+  .opt.wrong .mark{color:var(--no)}
+
+  .fb{
+    margin-top:20px;border-top:1px solid var(--line);padding-top:18px;
+    animation:in .22s ease;
+  }
+  @keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .verdict{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;margin-bottom:10px}
+  .verdict.ok{color:var(--ok)}
+  .verdict.no{color:var(--no)}
+  .concept{font-size:14.5px;color:#33384a;background:#f8f9fc;border-left:3px solid var(--accent);
+    border-radius:0 8px 8px 0;padding:10px 14px;margin:0 0 14px}
+  .why{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+  .why li{font-size:14.5px;line-height:1.55;padding-left:26px;position:relative;color:#3b4051}
+  .why li::before{position:absolute;left:0;top:0;font-weight:800}
+  .why li.good::before{content:"✓";color:var(--ok)}
+  .why li.bad::before{content:"✕";color:var(--no)}
+  .why li b.lbl{display:inline-block;font-family:ui-monospace,monospace;font-size:12.5px;
+    background:#eef0f6;color:#40465a;border-radius:5px;padding:0 5px;margin-right:5px}
+  .why li.picked{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px 8px 30px;color:var(--ink)}
+  .why li.picked::before{left:10px;top:8px}
+
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:15px;font-weight:600;border-radius:11px;cursor:pointer;transition:.15s}
+  .btn{background:var(--accent);color:#fff;border:1px solid var(--accent);padding:11px 22px}
+  .btn:hover{background:#4338ca}
+  .btn:disabled{background:#c9ccd8;border-color:#c9ccd8;cursor:not-allowed}
+  .btn.ghost{background:#fff;color:#3b4051;border:1.5px solid var(--line)}
+  .btn.ghost:hover{border-color:#c3c8f5;color:var(--accent)}
+  .hint{font-size:12.5px;color:var(--muted);margin-right:auto;align-self:center}
+
+  /* resultado */
+  .score{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 4px}
+  .ring{
+    --p:0;
+    width:104px;height:104px;border-radius:50%;flex:0 0 auto;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%),#e7e9f2 0);
+    display:grid;place-items:center;
+  }
+  .ring span{width:82px;height:82px;border-radius:50%;background:#fff;display:grid;place-items:center;
+    font-size:23px;font-weight:800;letter-spacing:-.02em}
+  .score-txt h2{margin:0 0 4px;font-size:21px;letter-spacing:-.01em}
+  .score-txt p{margin:0;color:var(--muted);font-size:14.5px}
+  table{width:100%;border-collapse:collapse;margin:20px 0 4px;font-size:14.5px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  td.num{font-variant-numeric:tabular-nums;text-align:right;width:70px}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.mid{background:#fff6e5;color:#a16207}
+  .pill.no{background:var(--no-soft);color:var(--no)}
+  .rev-list{margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+  .rev-list li{font-size:14.5px;background:#fbfbfe;border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .rev-list b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+  footer{color:var(--muted);font-size:12.5px;text-align:center;margin-top:26px}
+  @media (max-width:520px){
+    .wrap{padding:20px 12px 60px}
+    .card{padding:18px 15px 16px;border-radius:13px}
+    .q{font-size:16.5px}
+    .opt{font-size:15px;padding:12px 12px}
+    .bar-inner{padding:0 12px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-inner">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="count" id="count"><b>1</b> / 26</div>
+    <div class="timer hidden" id="timer">50:00</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">Física · Calorimetria e Termologia</div>
+    <h1>Simulado de Física — Calorimetria</h1>
+    <p class="sub">Montado a partir dos slides da sua aula de Calorimetria. Responda, confirme e veja o motivo do erro de cada alternativa.</p>
+  </header>
+
+  <div class="log" id="log">
+    <div class="log-head">
+      <span class="log-title">Registro de tentativas</span>
+      <div class="log-badges" id="logBadges"></div>
+      <button class="log-toggle" id="logToggle" type="button">Histórico</button>
+    </div>
+    <p class="log-note" id="logNote" hidden></p>
+    <ul class="log-list" id="logList" hidden></ul>
+    <div class="log-foot" id="logFoot" hidden>
+      <button class="log-clear" id="logClear" type="button">Apagar histórico</button>
+    </div>
+  </div>
+
+  <main id="stage"></main>
+
+<div class="modal" id="modal">
+  <div class="lesson" id="lesson"></div>
+</div>
+
+  <footer>Simulado gerado a partir dos slides da aula · funciona offline</footer>
+</div>
+
+<script>
+/* ============================================================
+   FIGURAS — diagramas de estrutura fisica em SVG embutido.
+   Funcionam offline. Cores presas ao tema para ler em qualquer fundo.
+   Convencao: linha = ligacao; vertice/ponta = carbono; H implicito.
+   Eixos/ligacoes #4b5060, destaque #4f46e5, rotulo secundario #6b7280.
+   ============================================================ */
+
+// 2,2,4-trimetilpentano (gasolina) — Q6 e Q7
+
+
+/* ============================================================
+   FIGURAS - SVG embutido, offline
+   ============================================================ */
+
+const SVG_TRES_PROPAGACAO = `
+<div class="figura">
+<svg viewBox="0 0 420 190" role="img" aria-label="Os tres processos de propagacao de calor: conducao no solido, conveccao no fluido e radiacao atravessando o vacuo">
+  <rect x="12" y="50" width="112" height="90" rx="8" fill="#eef0ff" stroke="#4f46e5" stroke-width="2"/>
+  <text x="34" y="42" fill="#4338ca" font-size="12" font-weight="700">CONDUCAO</text>
+  <line x1="34" y1="130" x2="34" y2="70" stroke="#b91c1c" stroke-width="3"/>
+  <circle cx="45" cy="76" r="4" fill="#b91c1c"/><circle cx="62" cy="76" r="4" fill="#dc2626"/>
+  <circle cx="79" cy="76" r="4" fill="#ef4444"/><circle cx="96" cy="76" r="4" fill="#f87171"/>
+  <text x="24" y="158" fill="#6b7280" font-size="10">solido, sem mover</text>
+  <rect x="152" y="50" width="112" height="90" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="176" y="42" fill="#15803d" font-size="12" font-weight="700">CONVECCAO</text>
+  <path d="M175 120 Q175 80 205 80 Q235 80 235 120" fill="none" stroke="#16a34a" stroke-width="2.5"/>
+  <polygon points="232,112 236,124 244,116" fill="#16a34a"/>
+  <text x="168" y="158" fill="#6b7280" font-size="10">fluido circula</text>
+  <rect x="292" y="50" width="112" height="90" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="318" y="42" fill="#c2410c" font-size="12" font-weight="700">RADIACAO</text>
+  <circle cx="324" cy="95" r="13" fill="#fbbf24" stroke="#ea580c" stroke-width="2"/>
+  <line x1="342" y1="88" x2="372" y2="78" stroke="#ea580c" stroke-width="2"/>
+  <line x1="342" y1="95" x2="376" y2="95" stroke="#ea580c" stroke-width="2"/>
+  <line x1="342" y1="102" x2="372" y2="112" stroke="#ea580c" stroke-width="2"/>
+  <text x="300" y="158" fill="#6b7280" font-size="10">ondas, ate no vacuo</text>
+</svg>
+<span class="cap">Tres caminhos: na <b>conducao</b> o material fica parado; na <b>conveccao</b> o proprio fluido circula; na <b>radiacao</b> viajam ondas e nao precisa de meio.</span>
+</div>`;
+
+const SVG_DILATACAO = `
+<div class="figura">
+<svg viewBox="0 0 400 180" role="img" aria-label="Barra metalica antes e depois do aquecimento, mostrando a dilatacao linear">
+  <rect x="30" y="45" width="150" height="26" rx="3" fill="#cbd5e1" stroke="#4b5060" stroke-width="2"/>
+  <text x="30" y="35" fill="#4b5060" font-size="12" font-weight="700">a 20 C</text>
+  <text x="92" y="63" fill="#334155" font-size="11">L0</text>
+  <rect x="30" y="110" width="196" height="26" rx="3" fill="#a5b4fc" stroke="#4f46e5" stroke-width="2"/>
+  <text x="30" y="100" fill="#4338ca" font-size="12" font-weight="700">a 120 C</text>
+  <text x="110" y="128" fill="#312e81" font-size="11">L0 + dL</text>
+  <line x1="184" y1="92" x2="228" y2="92" stroke="#b91c1c" stroke-width="2"/>
+  <text x="200" y="86" fill="#b91c1c" font-size="11" font-weight="700">dL</text>
+  <line x1="182" y1="58" x2="182" y2="123" stroke="#9aa1b4" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="248" y="120" fill="#6b7280" font-size="11">dL = L0 . alfa . dT</text>
+  <text x="248" y="140" fill="#9ca3af" font-size="10">dilatacao pequena: mm</text>
+</svg>
+<span class="cap">Ao aquecer, a barra cresce. <b>dL</b> depende do comprimento inicial, do material (alfa) e da variacao de temperatura.</span>
+</div>`;
+
+const SVG_CALORES = `
+<div class="figura">
+<svg viewBox="0 0 400 190" role="img" aria-label="Grafico temperatura por calor recebido: subida no calor sensivel e patamar no calor latente">
+  <line x1="55" y1="20" x2="55" y2="160" stroke="#9aa1b4" stroke-width="2"/>
+  <line x1="55" y1="160" x2="370" y2="160" stroke="#9aa1b4" stroke-width="2"/>
+  <text x="30" y="26" fill="#4b5060" font-size="13" font-style="italic">T</text>
+  <text x="366" y="178" fill="#4b5060" font-size="13" font-style="italic">Q</text>
+  <path d="M55 140 L130 90" fill="none" stroke="#4f46e5" stroke-width="3"/>
+  <path d="M130 90 L250 90" fill="none" stroke="#b91c1c" stroke-width="3"/>
+  <path d="M250 90 L330 40" fill="none" stroke="#4f46e5" stroke-width="3"/>
+  <text x="62" y="132" fill="#4338ca" font-size="11" font-weight="700">sensivel</text>
+  <text x="150" y="82" fill="#b91c1c" font-size="11" font-weight="700">latente</text>
+  <text x="262" y="34" fill="#4338ca" font-size="11" font-weight="700">sensivel</text>
+  <text x="138" y="108" fill="#6b7280" font-size="10">mudanca de estado</text>
+  <text x="138" y="120" fill="#6b7280" font-size="10">(T nao muda)</text>
+</svg>
+<span class="cap">Subindo: calor <b>sensivel</b> (muda a temperatura). No patamar: calor <b>latente</b> (muda o estado, T constante).</span>
+</div>`;
+
+/* ============================================================
+   BANCO DE QUESTOES — 43 questoes de Calorimetria
+   ============================================================ */
+const QUESTIONS = [
+ {
+  "tema": "Calor e equilíbrio",
+  "enunciado": "Calor é:",
+  "conceito": "Calor é <b>energia em trânsito</b> — só existe enquanto há diferença de temperatura. Quando as temperaturas se igualam, cessa a troca líquida: é o equilíbrio térmico.",
+  "licao": "calor-equilibrio",
+  "alternativas": [
+   {
+    "t": "energia térmica em trânsito",
+    "ok": true,
+    "porque": "Calor é energia térmica em trânsito: a energia que passa de um corpo para outro por causa da diferença de temperatura."
+   },
+   {
+    "t": "a temperatura de um corpo quente",
+    "ok": false,
+    "porque": "Temperatura é o grau de agitação das moléculas, não energia em trânsito. Um corpo tem temperatura, mas não \"tem calor\"."
+   },
+   {
+    "t": "uma substância que existe dentro dos corpos",
+    "ok": false,
+    "porque": "Essa é a teoria do calórico, abandonada no século XIX. Calor não é fluido nem substância: é energia em movimento."
+   },
+   {
+    "t": "a quantidade de matéria de um corpo",
+    "ok": false,
+    "porque": "Quantidade de matéria é massa (ou número de mols). Não tem relação com calor."
+   },
+   {
+    "t": "a energia que um corpo possui quando está quente",
+    "ok": false,
+    "porque": "Parece tentador, mas corpo não \"possui calor\": possui energia interna e temperatura. Calor é o trânsito dessa energia."
+   }
+  ]
+ },
+ {
+  "tema": "Calor e equilíbrio",
+  "enunciado": "Dois corpos em contato térmico, com T<sub>a</sub> > T<sub>b</sub>. O calor passa:",
+  "conceito": "Calor é <b>energia em trânsito</b> — só existe enquanto há diferença de temperatura. Quando as temperaturas se igualam, cessa a troca líquida: é o equilíbrio térmico.",
+  "licao": "calor-equilibrio",
+  "alternativas": [
+   {
+    "t": "de a para b, do mais quente para o mais frio",
+    "ok": true,
+    "porque": "O calor vai espontaneamente do corpo de maior temperatura para o de menor temperatura."
+   },
+   {
+    "t": "de b para a, porque b é mais frio",
+    "ok": false,
+    "porque": "O calor vai do mais quente para o mais frio, não do frio para o quente. Em b não há \"frio\" para enviar: falta energia."
+   },
+   {
+    "t": "nos dois sentidos ao mesmo tempo, sem parar",
+    "ok": false,
+    "porque": "Nos dois sentidos só haveria troca líquida zero, ou seja, equilíbrio. Antes disso, o fluxo resultante é de a para b."
+   },
+   {
+    "t": "não passa, porque as massas são diferentes",
+    "ok": false,
+    "porque": "A troca depende da diferença de temperatura, não da massa. Massas diferentes só mudam a temperatura final de equilíbrio."
+   },
+   {
+    "t": "do corpo de menor massa para o de maior massa",
+    "ok": false,
+    "porque": "Troca de calor depende de temperatura, não de massa. Massas diferentes só mudam a temperatura de equilíbrio."
+   }
+  ]
+ },
+ {
+  "tema": "Calor e equilíbrio",
+  "enunciado": "O equilíbrio térmico é atingido quando:",
+  "conceito": "Calor é <b>energia em trânsito</b> — só existe enquanto há diferença de temperatura. Quando as temperaturas se igualam, cessa a troca líquida: é o equilíbrio térmico.",
+  "licao": "calor-equilibrio",
+  "alternativas": [
+   {
+    "t": "o corpo mais quente fica a 0 °C",
+    "ok": false,
+    "porque": "0 °C é o ponto de fusão da água, não um estado de equilíbrio. O equilíbrio depende das temperaturas iniciais dos dois corpos."
+   },
+   {
+    "t": "o corpo mais frio perde todo o seu calor",
+    "ok": false,
+    "porque": "Nenhum corpo perde todo o calor a menos que chegue a 0 K. O que acontece é a igualdade de temperaturas, não o esvaziamento."
+   },
+   {
+    "t": "os dois corpos passam a ter a mesma temperatura",
+    "ok": true,
+    "porque": "No equilíbrio térmico as temperaturas se igualam e deixa de haver troca líquida de calor."
+   },
+   {
+    "t": "as massas dos corpos ficam iguais",
+    "ok": false,
+    "porque": "Massa não muda numa troca de calor. Quem se iguala é a temperatura."
+   },
+   {
+    "t": "o corpo mais quente cede calor até esfriar completamente",
+    "ok": false,
+    "porque": "Ele cede apenas até igualar a temperatura do outro. Se o outro está a 25 °C, o equilíbrio acontece em 25 °C, não em \"frio total\"."
+   }
+  ]
+ },
+ {
+  "tema": "Calor e equilíbrio",
+  "enunciado": "A calorimetria é o ramo da Física que estuda:",
+  "conceito": "Calor é <b>energia em trânsito</b> — só existe enquanto há diferença de temperatura. Quando as temperaturas se igualam, cessa a troca líquida: é o equilíbrio térmico.",
+  "licao": "calor-equilibrio",
+  "alternativas": [
+   {
+    "t": "a luz e as cores",
+    "ok": false,
+    "porque": "Isso é Óptica. Calorimetria trata de calor e de trocas de energia térmica."
+   },
+   {
+    "t": "o movimento dos planetas",
+    "ok": false,
+    "porque": "Isso é Gravitação/Astronomia, sem relação com calor."
+   },
+   {
+    "t": "as trocas de calor e os fenômenos relacionados",
+    "ok": true,
+    "porque": "Calorimetria estuda as trocas de calor e os fenômenos relacionados à transferência dessa energia entre os corpos."
+   },
+   {
+    "t": "a eletricidade nos fios",
+    "ok": false,
+    "porque": "Isso é Eletricidade. Calorimetria é o estudo das trocas de calor."
+   },
+   {
+    "t": "as mudanças de estado físico dos corpos",
+    "ok": false,
+    "porque": "Mudança de estado é um dos fenômenos estudados, mas a definição de calorimetria é mais ampla: as trocas de calor em geral."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível e latente",
+  "figura": SVG_CALORES,
+  "enunciado": "O calor sensível é aquele que:",
+  "conceito": "Dois calores, duas fórmulas: <b>sensível</b> muda a temperatura (Q = m·c·ΔT) e <b>latente</b> muda o estado físico com a temperatura constante (Q = m·L).",
+  "licao": "sensivel-latente",
+  "alternativas": [
+   {
+    "t": "muda o estado físico sem mudar a temperatura",
+    "ok": false,
+    "porque": "Essa é a definição do calor <b>latente</b>. Sensível é o que mexe no termômetro."
+   },
+   {
+    "t": "muda a temperatura do corpo",
+    "ok": true,
+    "porque": "Calor sensível altera a temperatura (podendo alterar as dimensões por dilatação). Já o latente altera o estado físico."
+   },
+   {
+    "t": "não troca energia",
+    "ok": false,
+    "porque": "Calor sensível é justamente energia sendo trocada. Ele altera a temperatura do corpo."
+   },
+   {
+    "t": "só existe no vácuo",
+    "ok": false,
+    "porque": "Calor sensível existe em qualquer meio. No vácuo a propagação é por radiação, o que é outra coisa."
+   },
+   {
+    "t": "altera o estado físico e mantém a temperatura",
+    "ok": false,
+    "porque": "Essa é a definição do calor latente. Sensível é o que altera a temperatura."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível e latente",
+  "enunciado": "O calor latente é aquele que:",
+  "conceito": "Dois calores, duas fórmulas: <b>sensível</b> muda a temperatura (Q = m·c·ΔT) e <b>latente</b> muda o estado físico com a temperatura constante (Q = m·L).",
+  "licao": "sensivel-latente",
+  "alternativas": [
+   {
+    "t": "faz a temperatura subir sem parar",
+    "ok": false,
+    "porque": "Calor latente ocorre com temperatura <b>constante</b>. Quem faz a temperatura subir é o calor sensível."
+   },
+   {
+    "t": "muda o estado físico com a temperatura constante",
+    "ok": true,
+    "porque": "Calor latente (de transformação) é o calor de uma mudança de estado: a temperatura fica constante durante ela."
+   },
+   {
+    "t": "só aparece em metais",
+    "ok": false,
+    "porque": "Mudança de estado acontece com qualquer substância — água, gelo, ferro, álcool."
+   },
+   {
+    "t": "é sempre negativo",
+    "ok": false,
+    "porque": "O sinal depende do sentido: positivo ao fundir/vaporizar (absorve), negativo ao solidificar/condensar (libera)."
+   },
+   {
+    "t": "altera a temperatura sem mudar o estado",
+    "ok": false,
+    "porque": "Essa é a definição do calor sensível. Latente é o que muda o estado com temperatura constante."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível e latente",
+  "enunciado": "Um pedaço de gelo a 0 °C está derretendo. Enquanto derrete, o calor que ele recebe:",
+  "conceito": "Dois calores, duas fórmulas: <b>sensível</b> muda a temperatura (Q = m·c·ΔT) e <b>latente</b> muda o estado físico com a temperatura constante (Q = m·L).",
+  "licao": "sensivel-latente",
+  "alternativas": [
+   {
+    "t": "faz a temperatura subir acima de 0 °C",
+    "ok": false,
+    "porque": "Enquanto houver gelo derretendo, a temperatura fica em 0 °C. Ela só sobe depois que todo o gelo virou água."
+   },
+   {
+    "t": "é todo perdido para o ambiente",
+    "ok": false,
+    "porque": "O calor não se perde: ele é usado para quebrar o arranjo do gelo e transformá-lo em água."
+   },
+   {
+    "t": "serve para mudar o estado e a temperatura fica em 0 °C",
+    "ok": true,
+    "porque": "Durante a mudança de estado o calor recebido só altera o estado (calor latente): a temperatura não muda."
+   },
+   {
+    "t": "faz a massa diminuir sem mudar de estado",
+    "ok": false,
+    "porque": "A massa não desaparece — ela muda de estado (sólido para líquido), permanecendo a mesma."
+   },
+   {
+    "t": "faz o gelo se aquecer até ferver imediatamente",
+    "ok": false,
+    "porque": "Não existe isso: o gelo derrete a 0 °C e a água resultante só começa a esquentar depois que todo o gelo derreteu."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível e latente",
+  "enunciado": "A fórmula do calor sensível é:",
+  "conceito": "Dois calores, duas fórmulas: <b>sensível</b> muda a temperatura (Q = m·c·ΔT) e <b>latente</b> muda o estado físico com a temperatura constante (Q = m·L).",
+  "licao": "sensivel-latente",
+  "alternativas": [
+   {
+    "t": "Q = m · L",
+    "ok": false,
+    "porque": "Essa é a fórmula do calor <b>latente</b>, usada na mudança de estado. Sensível usa c e ΔT."
+   },
+   {
+    "t": "P = Q / Δt",
+    "ok": false,
+    "porque": "Essa é a potência térmica (rapidez da troca), não o calor absorvido por um corpo."
+   },
+   {
+    "t": "Q = m · c · ΔT",
+    "ok": true,
+    "porque": "Calor sensível: Q = m · c · ΔT. A de calor latente é Q = m · L."
+   },
+   {
+    "t": "C = m / c",
+    "ok": false,
+    "porque": "Essa expressão não representa nada com significado físico. A capacidade térmica é C = m·c."
+   },
+   {
+    "t": "Q = m · L · ΔT",
+    "ok": false,
+    "porque": "Mistura as duas fórmulas: L pertence ao calor latente, que não tem ΔT. Essa expressão não representa nenhum dos dois calores."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível e latente",
+  "enunciado": "A fórmula do calor latente é:",
+  "conceito": "Dois calores, duas fórmulas: <b>sensível</b> muda a temperatura (Q = m·c·ΔT) e <b>latente</b> muda o estado físico com a temperatura constante (Q = m·L).",
+  "licao": "sensivel-latente",
+  "alternativas": [
+   {
+    "t": "Q = m · c · ΔT",
+    "ok": false,
+    "porque": "Essa é a do calor <b>sensível</b>, que muda a temperatura. Latente usa L, não c."
+   },
+   {
+    "t": "Q = C · Δt",
+    "ok": false,
+    "porque": "Mistura capacidade térmica (C) com tempo (Δt). Não corresponde a nenhuma das duas fórmulas."
+   },
+   {
+    "t": "Q = P / m",
+    "ok": false,
+    "porque": "Potência dividida por massa não resulta em calor (cal). A fórmula correta é Q = m·L."
+   },
+   {
+    "t": "Q = m · L",
+    "ok": true,
+    "porque": "Calor latente: Q = m · L, em que L é o calor latente de fusão, vaporização, etc."
+   },
+   {
+    "t": "Q = m · L · ΔT",
+    "ok": false,
+    "porque": "Mistura as duas fórmulas: no calor latente não existe ΔT, porque a temperatura não muda."
+   }
+  ]
+ },
+ {
+  "tema": "Calor específico e capacidade térmica",
+  "enunciado": "O calor específico de uma substância é:",
+  "conceito": "<b>Calor específico (c)</b> é por grama e depende do material. <b>Capacidade térmica (C)</b> é do corpo inteiro e depende da massa: C = m·c.",
+  "licao": "especifico-capacidade",
+  "alternativas": [
+   {
+    "t": "a quantidade de calor para cada grama variar 1 °C",
+    "ok": true,
+    "porque": "Calor específico (c) é o calor necessário para cada grama da substância variar 1 °C. Já a capacidade térmica (C) é do corpo inteiro."
+   },
+   {
+    "t": "a quantidade de calor para o corpo todo variar 1 °C",
+    "ok": false,
+    "porque": "Essa é a <b>capacidade térmica</b>, que depende da massa. Calor específico é por grama."
+   },
+   {
+    "t": "a temperatura em que ela derrete",
+    "ok": false,
+    "porque": "Isso é ponto de fusão, uma temperatura. Calor específico é energia por grama por grau."
+   },
+   {
+    "t": "a massa que cabe em 1 litro",
+    "ok": false,
+    "porque": "Isso seria densidade. Calor específico mede energia térmica, não massa."
+   },
+   {
+    "t": "a energia total armazenada no corpo",
+    "ok": false,
+    "porque": "Essa é a energia interna, que depende da massa e da temperatura. Calor específico é uma propriedade por grama."
+   }
+  ]
+ },
+ {
+  "tema": "Calor específico e capacidade térmica",
+  "enunciado": "Pela tabela da aula, a substância que <b>esquenta mais depressa</b> com o mesmo calor (mesma massa) é aquela de menor c, ou seja:",
+  "conceito": "<b>Calor específico (c)</b> é por grama e depende do material. <b>Capacidade térmica (C)</b> é do corpo inteiro e depende da massa: C = m·c.",
+  "licao": "especifico-capacidade",
+  "alternativas": [
+   {
+    "t": "a água (1,00 cal/g·°C)",
+    "ok": false,
+    "porque": "A água tem o <b>maior</b> calor específico da tabela: é a que mais demora para esquentar, não a mais rápida."
+   },
+   {
+    "t": "o gelo (0,50 cal/g·°C)",
+    "ok": false,
+    "porque": "Esquenta mais rápido que a água, mas ainda precisa de 0,50 — não é o menor valor da tabela."
+   },
+   {
+    "t": "o alumínio (0,21 cal/g·°C)",
+    "ok": false,
+    "porque": "É rápido, mas o ouro tem valor ainda menor (0,03), então esquenta mais depressa que o alumínio."
+   },
+   {
+    "t": "o ouro (0,03 cal/g·°C)",
+    "ok": true,
+    "porque": "Quanto menor o calor específico, menos calor é preciso para variar a temperatura: o ouro (0,03) é o que esquenta mais depressa."
+   },
+   {
+    "t": "o vidro (0,16 cal/g·°C)",
+    "ok": false,
+    "porque": "O vidro esquenta rápido, mas o ouro (0,03) tem valor ainda menor, então esquenta mais depressa."
+   }
+  ]
+ },
+ {
+  "tema": "Calor específico e capacidade térmica",
+  "enunciado": "A água demora para esquentar e demora para esfriar porque:",
+  "conceito": "<b>Calor específico (c)</b> é por grama e depende do material. <b>Capacidade térmica (C)</b> é do corpo inteiro e depende da massa: C = m·c.",
+  "licao": "especifico-capacidade",
+  "alternativas": [
+   {
+    "t": "tem calor específico muito baixo",
+    "ok": false,
+    "porque": "Ao contrário: o calor específico da água é <b>alto</b> (1,00), o maior da tabela. É por isso que demora."
+   },
+   {
+    "t": "tem calor específico alto (1,00 cal/g·°C)",
+    "ok": true,
+    "porque": "O calor específico da água é o maior da tabela: ela precisa de muito calor para variar a temperatura."
+   },
+   {
+    "t": "não troca calor",
+    "ok": false,
+    "porque": "A água troca calor muito bem. O que ela faz devagar é mudar de temperatura."
+   },
+   {
+    "t": "tem massa sempre pequena",
+    "ok": false,
+    "porque": "A massa não é sempre pequena, e ela não explica a lentidão — o calor específico sim."
+   },
+   {
+    "t": "tem calor específico igual ao dos metais",
+    "ok": false,
+    "porque": "Os metais têm c baixíssimo (aço 0,10) e esquentam rápido. A água tem o maior c da tabela, por isso é lenta."
+   }
+  ]
+ },
+ {
+  "tema": "Calor específico e capacidade térmica",
+  "enunciado": "A capacidade térmica de um corpo é dada por:",
+  "conceito": "<b>Calor específico (c)</b> é por grama e depende do material. <b>Capacidade térmica (C)</b> é do corpo inteiro e depende da massa: C = m·c.",
+  "licao": "especifico-capacidade",
+  "alternativas": [
+   {
+    "t": "C = Q · ΔT",
+    "ok": false,
+    "porque": "Multiplicar calor por temperatura não dá cal/°C. A capacidade térmica é razão: calor dividido pela variação."
+   },
+   {
+    "t": "C = Q / ΔT",
+    "ok": true,
+    "porque": "C = Q / ΔT, em cal/°C: calor necessário para o corpo variar 1 °C."
+   },
+   {
+    "t": "C = ΔT / Q",
+    "ok": false,
+    "porque": "Inverte a razão. Isso daria °C/cal, o inverso da unidade correta (cal/°C)."
+   },
+   {
+    "t": "C = m / Q",
+    "ok": false,
+    "porque": "Mistura massa com calor e não tem relação com capacidade térmica."
+   },
+   {
+    "t": "C = Q · m",
+    "ok": false,
+    "porque": "Somar massa à conta não dá cal/°C. A capacidade térmica é calor dividido por variação de temperatura."
+   }
+  ]
+ },
+ {
+  "tema": "Calor específico e capacidade térmica",
+  "enunciado": "A relação entre capacidade térmica (C), massa (m) e calor específico (c) é:",
+  "conceito": "<b>Calor específico (c)</b> é por grama e depende do material. <b>Capacidade térmica (C)</b> é do corpo inteiro e depende da massa: C = m·c.",
+  "licao": "especifico-capacidade",
+  "alternativas": [
+   {
+    "t": "C = m · c",
+    "ok": true,
+    "porque": "Substituindo Q = m·c·ΔT em C = Q/ΔT resulta C = m · c."
+   },
+   {
+    "t": "C = m + c",
+    "ok": false,
+    "porque": "Somar massa com calor específico mistura unidades incompatíveis (g com cal/g·°C). A relação é produto."
+   },
+   {
+    "t": "C = m / c",
+    "ok": false,
+    "porque": "Dividir daria g²·°C/cal, unidade sem sentido. A capacidade é massa <b>vezes</b> calor específico."
+   },
+   {
+    "t": "C = c / m",
+    "ok": false,
+    "porque": "Também inverte: dividir o calor específico pela massa diminui a capacidade, quando mais massa aumenta."
+   },
+   {
+    "t": "C = m · c · ΔT",
+    "ok": false,
+    "porque": "Essa é a fórmula do calor sensível (dá calorias). A capacidade térmica é só massa vezes calor específico."
+   }
+  ]
+ },
+ {
+  "tema": "Trocas de calor",
+  "enunciado": "Em um sistema fechado, a soma das trocas de calor entre os corpos é:",
+  "conceito": "Em sistema fechado, o calor que um corpo cede é exatamente o que o outro recebe: <b>Q_recebido + Q_cedido = 0</b>. Isso vem da conservação da energia.",
+  "licao": "trocas",
+  "alternativas": [
+   {
+    "t": "sempre positiva",
+    "ok": false,
+    "porque": "Se a soma fosse sempre positiva, energia estaria sendo criada. O balanço é nulo."
+   },
+   {
+    "t": "sempre negativa",
+    "ok": false,
+    "porque": "Seria energia desaparecendo. A conservação exige soma zero."
+   },
+   {
+    "t": "igual à massa total",
+    "ok": false,
+    "porque": "Massa (g) e calor (cal) são grandezas diferentes; não se igualam."
+   },
+   {
+    "t": "nula (igual a zero)",
+    "ok": true,
+    "porque": "Num sistema fechado, Q recebido + Q cedido = 0."
+   },
+   {
+    "t": "igual ao calor recebido pelo corpo mais quente",
+    "ok": false,
+    "porque": "Isso só valeria com dois corpos. A propriedade geral é a soma de todas as trocas ser zero."
+   }
+  ]
+ },
+ {
+  "tema": "Trocas de calor",
+  "enunciado": "A propriedade Q<sub>recebido</sub> + Q<sub>cedido</sub> = 0 decorre:",
+  "conceito": "Em sistema fechado, o calor que um corpo cede é exatamente o que o outro recebe: <b>Q_recebido + Q_cedido = 0</b>. Isso vem da conservação da energia.",
+  "licao": "trocas",
+  "alternativas": [
+   {
+    "t": "da lei da gravidade",
+    "ok": false,
+    "porque": "Gravidade trata de forças entre massas. Nada a ver com troca de calor."
+   },
+   {
+    "t": "da dilatação dos sólidos",
+    "ok": false,
+    "porque": "Dilatação é consequência do aquecimento, não a origem do balanço de energia."
+   },
+   {
+    "t": "da conservação da energia",
+    "ok": true,
+    "porque": "É consequência da conservação da energia: o calor que um corpo perde é o que os outros ganham."
+   },
+   {
+    "t": "da lei de Ohm",
+    "ok": false,
+    "porque": "Lei de Ohm é de circuitos elétricos (U = R·i), outro assunto."
+   },
+   {
+    "t": "da definição de temperatura absoluta",
+    "ok": false,
+    "porque": "Kelvin trata de escala de temperatura. O balanço de calores vem da conservação da energia."
+   }
+  ]
+ },
+ {
+  "tema": "Potência térmica",
+  "enunciado": "A potência térmica mede:",
+  "conceito": "<b>Potência térmica</b> mede a rapidez da transferência: P = Q/Δt. Diz quanto calor por segundo, não quanto calor no total.",
+  "licao": "potencia",
+  "alternativas": [
+   {
+    "t": "a massa de um corpo",
+    "ok": false,
+    "porque": "Massa é quantidade de matéria. Potência térmica mede energia por tempo."
+   },
+   {
+    "t": "a temperatura final de um sistema",
+    "ok": false,
+    "porque": "A temperatura final é um estado, não uma rapidez. Potência é taxa."
+   },
+   {
+    "t": "o calor específico de uma substância",
+    "ok": false,
+    "porque": "Calor específico é propriedade do material (cal/g·°C), sem relação com tempo."
+   },
+   {
+    "t": "a rapidez com que o calor é trocado",
+    "ok": true,
+    "porque": "Potência térmica P = Q/Δt mede a rapidez da troca de calor (quanto calor por segundo)."
+   },
+   {
+    "t": "a energia total transferida",
+    "ok": false,
+    "porque": "Energia total é o calor Q. Potência é essa energia dividida pelo tempo — é rapidez, não quantidade."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível (cálculo)",
+  "enunciado": "Que quantidade de calor é necessária para aquecer 200 g de água de 20 °C a 70 °C? (c = 1,00 cal/g·°C)",
+  "conceito": "Use Q = m·c·ΔT com ΔT = final − inicial. Cuidado com a unidade da massa: se c está em cal/g·°C, a massa tem de estar em gramas.",
+  "licao": "conta-sensivel",
+  "alternativas": [
+   {
+    "t": "10 000 cal",
+    "ok": true,
+    "porque": "Q = m·c·ΔT = 200 · 1 · (70 − 20) = 10 000 cal."
+   },
+   {
+    "t": "2 000 cal",
+    "ok": false,
+    "porque": "Saiu de 200 × 10, como se ΔT fosse 10. A variação é 70 − 20 = 50 °C."
+   },
+   {
+    "t": "5 000 cal",
+    "ok": false,
+    "porque": "Saiu de 100 × 50: usou massa de 100 g em vez de 200 g."
+   },
+   {
+    "t": "14 000 cal",
+    "ok": false,
+    "porque": "Saiu de 200 × 70, usando a temperatura final em vez da variação (ΔT = 50)."
+   },
+   {
+    "t": "7 000 cal",
+    "ok": false,
+    "porque": "Saiu de 100 × 70: usou massa de 100 g (em vez de 200) e a temperatura final (em vez da variação)."
+   }
+  ]
+ },
+ {
+  "tema": "Capacidade térmica (cálculo)",
+  "enunciado": "Qual a capacidade térmica de um corpo de 500 g de alumínio? (c = 0,21 cal/g·°C)",
+  "conceito": "C = m·c ou C = Q/ΔT. A capacidade térmica vale cal/°C e responde: quanto calor esse corpo precisa para variar 1 °C?",
+  "licao": "conta-capacidade",
+  "alternativas": [
+   {
+    "t": "21 cal/°C",
+    "ok": false,
+    "porque": "Saiu de 100 × 0,21 (massa de 100 g). A massa é 500 g."
+   },
+   {
+    "t": "105 cal/°C",
+    "ok": true,
+    "porque": "C = m·c = 500 · 0,21 = 105 cal/°C."
+   },
+   {
+    "t": "210 cal/°C",
+    "ok": false,
+    "porque": "Saiu de 1000 × 0,21. A massa do corpo é 500 g, não 1000 g."
+   },
+   {
+    "t": "500 cal/°C",
+    "ok": false,
+    "porque": "É só a massa, sem multiplicar pelo calor específico."
+   },
+   {
+    "t": "10,5 cal/°C",
+    "ok": false,
+    "porque": "Erro de fator 10: 500 × 0,21 = 105, não 10,5."
+   }
+  ]
+ },
+ {
+  "tema": "Calor latente (cálculo)",
+  "enunciado": "Quanto calor é necessário para fundir 300 g de gelo a 0 °C? (L<sub>F</sub> = 80 cal/g)",
+  "conceito": "Durante a mudança de estado use Q = m·L, e <b>não</b> Q = m·c·ΔT. A temperatura fica constante; todo o calor vai para mudar o estado.",
+  "licao": "conta-latente",
+  "alternativas": [
+   {
+    "t": "2 400 cal",
+    "ok": false,
+    "porque": "Saiu de 30 × 80 (massa de 30 g). A massa é 300 g."
+   },
+   {
+    "t": "24 000 cal",
+    "ok": true,
+    "porque": "Q = m·L = 300 · 80 = 24 000 cal (a temperatura fica em 0 °C)."
+   },
+   {
+    "t": "8 000 cal",
+    "ok": false,
+    "porque": "Saiu de 100 × 80. A massa do gelo é 300 g, não 100 g."
+   },
+   {
+    "t": "240 000 cal",
+    "ok": false,
+    "porque": "Um zero a mais: 300 × 80 = 24 000."
+   },
+   {
+    "t": "4 800 cal",
+    "ok": false,
+    "porque": "Um zero a menos: 300 × 80 = 24 000."
+   }
+  ]
+ },
+ {
+  "tema": "Trocas de calor (cálculo)",
+  "enunciado": "Misturam-se 100 g de água a 80 °C com 300 g de água a 20 °C. A temperatura final (equilíbrio) é:",
+  "conceito": "Monte Q_recebido + Q_cedido = 0. Com massas e substâncias iguais, a temperatura final é a média das temperaturas.",
+  "licao": "conta-trocas",
+  "alternativas": [
+   {
+    "t": "30 °C",
+    "ok": false,
+    "porque": "Sairia se a massa maior fosse a quente. Como 300 g estão a 20 °C, a mistura fica mais perto de 20 do que de 80."
+   },
+   {
+    "t": "35 °C",
+    "ok": true,
+    "porque": "100·(T − 80) + 300·(T − 20) = 0, logo 400T = 14 000 e T = 35 °C."
+   },
+   {
+    "t": "40 °C",
+    "ok": false,
+    "porque": "É a média simples, que só vale para massas iguais. Aqui são 100 g e 300 g."
+   },
+   {
+    "t": "50 °C",
+    "ok": false,
+    "porque": "Ficaria acima do peso correto: a massa fria (300 g) puxa a temperatura para baixo."
+   },
+   {
+    "t": "60 °C",
+    "ok": false,
+    "porque": "Ficaria acima da temperatura da massa quente misturada, o que é impossível: a mistura não pode ser mais quente que o corpo mais quente."
+   }
+  ]
+ },
+ {
+  "tema": "Potência térmica (cálculo)",
+  "enunciado": "Uma fonte fornece 6 000 cal em 20 s. Sua potência térmica é:",
+  "conceito": "P = Q/Δt. Para achar o calor a partir da potência, inverta: Q = P·Δt.",
+  "licao": "conta-potencia",
+  "alternativas": [
+   {
+    "t": "120 cal/s",
+    "ok": false,
+    "porque": "Saiu de 6 000 / 50. O intervalo é 20 s."
+   },
+   {
+    "t": "600 cal/s",
+    "ok": false,
+    "porque": "Um zero a menos: 6 000 / 20 = 300."
+   },
+   {
+    "t": "3 000 cal/s",
+    "ok": false,
+    "porque": "Saiu de 6 000 / 2. O tempo é 20 s, não 2 s."
+   },
+   {
+    "t": "300 cal/s",
+    "ok": true,
+    "porque": "P = Q/Δt = 6 000 / 20 = 300 cal/s."
+   },
+   {
+    "t": "30 cal/s",
+    "ok": false,
+    "porque": "Erro de fator 10: 6 000 / 20 = 300."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível (cálculo)",
+  "enunciado": "Um bloco de 100 g de aço (c = 0,10 cal/g·°C) recebe 300 cal. Sua temperatura sobe:",
+  "conceito": "Use Q = m·c·ΔT com ΔT = final − inicial. Cuidado com a unidade da massa: se c está em cal/g·°C, a massa tem de estar em gramas.",
+  "licao": "conta-sensivel",
+  "alternativas": [
+   {
+    "t": "3 °C",
+    "ok": false,
+    "porque": "Saiu de 300 / 100, esquecendo o calor específico (0,10)."
+   },
+   {
+    "t": "10 °C",
+    "ok": false,
+    "porque": "Saiu de 300 / 30 ou de outra combinação: ΔT = Q/(m·c) = 300/10 = 30 °C."
+   },
+   {
+    "t": "300 °C",
+    "ok": false,
+    "porque": "Saiu de 300 / 1, ignorando a massa e o calor específico."
+   },
+   {
+    "t": "30 °C",
+    "ok": true,
+    "porque": "ΔT = Q/(m·c) = 300 / (100 · 0,10) = 30 °C."
+   },
+   {
+    "t": "1 °C",
+    "ok": false,
+    "porque": "Saiu de 300 / 300, somando massa e calor específico em vez de multiplicar."
+   }
+  ]
+ },
+ {
+  "tema": "Capacidade térmica (cálculo)",
+  "enunciado": "Um corpo de capacidade térmica 40 cal/°C recebe 800 cal. Sua temperatura varia:",
+  "conceito": "C = m·c ou C = Q/ΔT. A capacidade térmica vale cal/°C e responde: quanto calor esse corpo precisa para variar 1 °C?",
+  "licao": "conta-capacidade",
+  "alternativas": [
+   {
+    "t": "20 °C",
+    "ok": true,
+    "porque": "ΔT = Q/C = 800/40 = 20 °C."
+   },
+   {
+    "t": "2 °C",
+    "ok": false,
+    "porque": "Saiu de 40 / 800, invertendo a razão. ΔT = Q/C = 800/40."
+   },
+   {
+    "t": "32 °C",
+    "ok": false,
+    "porque": "Saiu de 800 / 25 ou de conta parcial. Use Q/C com C = 40 cal/°C."
+   },
+   {
+    "t": "200 °C",
+    "ok": false,
+    "porque": "Saiu de 800 / 4. A capacidade térmica é 40, não 4."
+   },
+   {
+    "t": "0,05 °C",
+    "ok": false,
+    "porque": "Inverteu completamente a razão: 40/800 em vez de 800/40."
+   }
+  ]
+ },
+ {
+  "tema": "Sinal do calor",
+  "enunciado": "50 g de água esfriam de 40 °C para 30 °C. O calor trocado (c = 1 cal/g·°C) vale:",
+  "conceito": "ΔT é sempre final − inicial. Se o corpo esfria, ΔT é negativo e Q também: o sinal negativo significa calor <b>cedido</b>.",
+  "licao": "conta-sinal",
+  "alternativas": [
+   {
+    "t": "−500 cal (cedeu)",
+    "ok": true,
+    "porque": "Q = 50 · 1 · (30 − 40) = −500 cal: o sinal negativo mostra que a água cedeu calor."
+   },
+   {
+    "t": "+500 cal (recebeu)",
+    "ok": false,
+    "porque": "Errou o sinal: a água <b>esfriou</b> (40 → 30 °C), então cedeu calor."
+   },
+   {
+    "t": "+50 cal (recebeu)",
+    "ok": false,
+    "porque": "Errou o sinal e a conta: usou ΔT = 1 em vez de 10, e o corpo cede calor."
+   },
+   {
+    "t": "−50 cal (cedeu)",
+    "ok": false,
+    "porque": "Acertou o sinal, mas usou ΔT = 1. A variação é 30 − 40 = −10 °C."
+   },
+   {
+    "t": "−5 000 cal (cedeu)",
+    "ok": false,
+    "porque": "Erro de fator 10: usou ΔT = 100 em vez de 10 °C."
+   }
+  ]
+ },
+ {
+  "tema": "Trocas de calor (cálculo)",
+  "enunciado": "Misturam-se massas iguais de água a 10 °C e a 50 °C. A temperatura de equilíbrio é:",
+  "conceito": "Monte Q_recebido + Q_cedido = 0. Com massas e substâncias iguais, a temperatura final é a média das temperaturas.",
+  "licao": "conta-trocas",
+  "alternativas": [
+   {
+    "t": "20 °C",
+    "ok": false,
+    "porque": "Seria se a massa fria fosse maior. Com massas iguais, a média é 30 °C."
+   },
+   {
+    "t": "40 °C",
+    "ok": false,
+    "porque": "Fica acima da média (30 °C): puxaria para a água quente, mas as massas são iguais."
+   },
+   {
+    "t": "30 °C",
+    "ok": true,
+    "porque": "Com massas e calores específicos iguais, a temperatura final é a média: (10 + 50)/2 = 30 °C."
+   },
+   {
+    "t": "60 °C",
+    "ok": false,
+    "porque": "Impossível: a mistura não pode ficar mais quente que a água mais quente (50 °C)."
+   },
+   {
+    "t": "15 °C",
+    "ok": false,
+    "porque": "Ficaria abaixo da água mais fria (10 °C)? Não: 15 °C está entre as duas, mas com massas iguais a média é 30 °C."
+   }
+  ]
+ },
+ {
+  "tema": "Potência térmica (cálculo)",
+  "enunciado": "Uma fonte de 200 cal/s funciona por 30 s. O calor fornecido é:",
+  "conceito": "P = Q/Δt. Para achar o calor a partir da potência, inverta: Q = P·Δt.",
+  "licao": "conta-potencia",
+  "alternativas": [
+   {
+    "t": "6 000 cal",
+    "ok": true,
+    "porque": "Q = P · Δt = 200 · 30 = 6 000 cal."
+   },
+   {
+    "t": "600 cal",
+    "ok": false,
+    "porque": "Um zero a menos: 200 × 30 = 6 000."
+   },
+   {
+    "t": "2 000 cal",
+    "ok": false,
+    "porque": "Saiu de 200 × 10. O tempo é 30 s."
+   },
+   {
+    "t": "60 000 cal",
+    "ok": false,
+    "porque": "Um zero a mais: 200 × 30 = 6 000."
+   },
+   {
+    "t": "600 cal",
+    "ok": false,
+    "porque": "Um zero a menos: 200 × 30 = 6 000."
+   }
+  ]
+ },
+ {
+  "tema": "Calor sensível (cálculo)",
+  "enunciado": "Quanto calor recebe 200 g de ouro (c = 0,03 cal/g·°C) ao ser aquecido de 20 °C a 120 °C?",
+  "conceito": "Use Q = m·c·ΔT com ΔT = final − inicial. Cuidado com a unidade da massa: se c está em cal/g·°C, a massa tem de estar em gramas.",
+  "licao": "conta-sensivel",
+  "alternativas": [
+   {
+    "t": "60 cal",
+    "ok": false,
+    "porque": "Saiu de 200 × 0,3 ou de 20 × 3. A conta é 200 × 0,03 × 100."
+   },
+   {
+    "t": "6 000 cal",
+    "ok": false,
+    "porque": "Usou c = 0,30 em vez de 0,03 — dez vezes maior."
+   },
+   {
+    "t": "600 cal",
+    "ok": true,
+    "porque": "Q = m·c·ΔT = 200 · 0,03 · 100 = 600 cal."
+   },
+   {
+    "t": "24 000 cal",
+    "ok": false,
+    "porque": "Usou c = 1,0 (água) em vez de 0,03 (ouro)."
+   },
+   {
+    "t": "1 200 cal",
+    "ok": false,
+    "porque": "Usou c = 0,06, o dobro do ouro. O valor correto é 0,03."
+   }
+  ]
+ },
+ {
+  "tema": "Calor específico (cálculo)",
+  "enunciado": "Um corpo de 500 g recebe 1 000 cal e sua temperatura sobe 10 °C. Pela tabela da aula, ele é feito de:",
+  "conceito": "Isole c em Q = m·c·ΔT: c = Q/(m·ΔT). Compare o valor com a tabela da aula para identificar o material.",
+  "licao": "conta-especifico",
+  "alternativas": [
+   {
+    "t": "água (1,00)",
+    "ok": false,
+    "porque": "Para ser água, c teria de dar 1,00. A conta dá 0,20."
+   },
+   {
+    "t": "gelo (0,50)",
+    "ok": false,
+    "porque": "Para ser gelo, c teria de dar 0,50. A conta dá 0,20."
+   },
+   {
+    "t": "ouro (0,03)",
+    "ok": false,
+    "porque": "Para ser ouro, c teria de dar 0,03. A conta dá 0,20, que é o valor da areia."
+   },
+   {
+    "t": "areia (0,20)",
+    "ok": true,
+    "porque": "c = Q/(m·ΔT) = 1 000 / (500 · 10) = 0,20 cal/g·°C, valor da areia."
+   },
+   {
+    "t": "vidro (0,16)",
+    "ok": false,
+    "porque": "Para ser vidro, c teria de dar 0,16. A conta dá 0,20, que é a areia."
+   }
+  ]
+ },
+ {
+  "tema": "Propagação de calor",
+  "figura": SVG_TRES_PROPAGACAO,
+  "enunciado": "Os três processos de propagação de calor são:",
+  "conceito": "O calor viaja de três formas: <b>condução</b> (corpo a corpo, sem que o material se mova), <b>convecção</b> (movimento de um fluido) e <b>radiação</b> (ondas eletromagnéticas). O slide da aula lista os três nomes — a explicação de cada um é o que a prova cobra.",
+  "licao": "propagacao-calor",
+  "alternativas": [
+   {
+    "t": "Condução, convecção e radiação.",
+    "ok": true,
+    "porque": "São os três processos. Cada um funciona num contexto diferente: condução nos sólidos, convecção nos fluidos, radiação no vácuo também."
+   },
+   {
+    "t": "Condução, dilatação e fusão.",
+    "ok": false,
+    "porque": "Dilatação é variação de dimensões e fusão é mudança de estado — nem uma nem outra é forma de o calor viajar."
+   },
+   {
+    "t": "Radiação, sublimação e convecção.",
+    "ok": false,
+    "porque": "Sublimação é passagem direta do sólido para o gasoso, uma mudança de estado, não propagação de calor."
+   },
+   {
+    "t": "Convecção, vaporização e condução.",
+    "ok": false,
+    "porque": "Vaporização é mudança de estado (calor latente), não propagação."
+   },
+   {
+    "t": "Irradiação, dilatação e condução.",
+    "ok": false,
+    "porque": "Dilatação entra na lista errada: é consequência do calor, não forma de propagação."
+   }
+  ]
+ },
+ {
+  "tema": "Propagação de calor",
+  "enunciado": "Uma colher de metal dentro de uma panela de água quente fica quente na parte de cima, que não está na água. Isso acontece por:",
+  "conceito": "Na <b>condução</b>, o calor passa de partícula para partícula sem que o material se desloque. É o processo típico dos sólidos, e especialmente dos metais, que são bons condutores.",
+  "licao": "propagacao-calor",
+  "alternativas": [
+   {
+    "t": "Condução.",
+    "ok": true,
+    "porque": "As partículas do metal vibram mais e transmitem essa agitação às vizinhas, levando o calor pela haste. O metal não se desloca."
+   },
+   {
+    "t": "Convecção.",
+    "ok": false,
+    "porque": "Convecção exige um fluido que se mova formando correntes. O metal sólido não circula."
+   },
+   {
+    "t": "Radiação.",
+    "ok": false,
+    "porque": "A radiação existe, mas é fração pequena aqui. O calor subindo pela haste de metal é condução."
+   },
+   {
+    "t": "Evaporação.",
+    "ok": false,
+    "porque": "Evaporação é mudança de estado da água, não transporte de calor dentro do metal."
+   },
+   {
+    "t": "Dilatação.",
+    "ok": false,
+    "porque": "Dilatação é o aumento das dimensões do metal; não explica o calor chegar à outra ponta."
+   }
+  ]
+ },
+ {
+  "tema": "Propagação de calor",
+  "enunciado": "O ar-condicionado é instalado no alto da parede porque o ar frio desce e o quente sobe. Esse movimento é:",
+  "conceito": "Na <b>convecção</b>, o fluido aquecido fica menos denso e sobe, enquanto o mais frio (mais denso) desce, formando correntes. É o processo típico de líquidos e gases.",
+  "licao": "propagacao-calor",
+  "alternativas": [
+   {
+    "t": "Convecção.",
+    "ok": true,
+    "porque": "O ar frio é mais denso e desce; o ar quente é menos denso e sobe. Esse vai e vem do próprio fluido é a convecção."
+   },
+   {
+    "t": "Condução.",
+    "ok": false,
+    "porque": "O ar é péssimo condutor. Se dependesse de condução, o ambiente demoraria muito mais para esfriar."
+   },
+   {
+    "t": "Radiação.",
+    "ok": false,
+    "porque": "Radiação não depende de mover o ar. Se fosse só radiação, a posição do aparelho não faria tanta diferença."
+   },
+   {
+    "t": "Dilatação do ar.",
+    "ok": false,
+    "porque": "O ar de fato se dilata ao esquentar, mas dilatação é consequência — o nome do transporte é convecção."
+   },
+   {
+    "t": "Calor latente.",
+    "ok": false,
+    "porque": "Calor latente é o calor de mudança de estado, que não é o caso aqui."
+   }
+  ]
+ },
+ {
+  "tema": "Propagação de calor",
+  "enunciado": "O calor do Sol chega à Terra. Como não existe matéria entre os dois, a propagação ocorre por:",
+  "conceito": "<b>Radiação</b> é a única forma de propagação que não precisa de meio material: o calor viaja como onda eletromagnética, inclusive no vácuo. É o que permite sentir o calor de uma fogueira de longe.",
+  "licao": "propagacao-calor",
+  "alternativas": [
+   {
+    "t": "Radiação.",
+    "ok": true,
+    "porque": "Ondas eletromagnéticas atravessam o vácuo do espaço. É a única das três que funciona sem meio material."
+   },
+   {
+    "t": "Condução.",
+    "ok": false,
+    "porque": "Condução precisa de partículas em contato. No vácuo entre o Sol e a Terra não há material para conduzir."
+   },
+   {
+    "t": "Convecção.",
+    "ok": false,
+    "porque": "Convecção precisa de um fluido que circule. Não há fluido no espaço entre os astros."
+   },
+   {
+    "t": "Evaporação.",
+    "ok": false,
+    "porque": "Não há água evaporando no caminho para transportar calor."
+   },
+   {
+    "t": "Dilatação.",
+    "ok": false,
+    "porque": "Dilatação não transporta calor de um lugar para outro."
+   }
+  ]
+ },
+ {
+  "tema": "Propagação de calor",
+  "enunciado": "Numa garrafa térmica, o vácuo entre as duas paredes de vidro serve principalmente para evitar:",
+  "conceito": "O vácuo impede a <b>condução</b> e a <b>convecção</b>, porque ambas precisam de matéria. A parede espelhada cuida da <b>radiação</b>, refletindo-a. É um exemplo que reúne os três processos.",
+  "licao": "propagacao-calor",
+  "alternativas": [
+   {
+    "t": "A condução e a convecção, mas não a radiação.",
+    "ok": true,
+    "porque": "Sem matéria não há condução nem correntes de convecção. Para a radiação é preciso a superfície espelhada, que reflete o calor de volta."
+   },
+   {
+    "t": "Os três processos ao mesmo tempo, sozinho.",
+    "ok": false,
+    "porque": "O vácuo resolve condução e convecção, mas a radiação atravessa o vácuo — por isso a garrafa também tem paredes espelhadas."
+   },
+   {
+    "t": "Somente a radiação.",
+    "ok": false,
+    "porque": "Ao contrário: radiação é justamente o que atravessa o vácuo. O que o vácuo barra é condução e convecção."
+   },
+   {
+    "t": "A dilatação do líquido interno.",
+    "ok": false,
+    "porque": "O vácuo está entre as paredes, para isolar termicamente, não para conter dilatação."
+   },
+   {
+    "t": "A evaporação do café.",
+    "ok": false,
+    "porque": "A tampa é que reduz a evaporação. O vácuo entre as paredes tem outra função."
+   }
+  ]
+ },
+ {
+  "tema": "Calor latente de vaporização",
+  "enunciado": "Para a água em pressão normal, o calor latente de fusão vale 80 cal/g e o de vaporização vale 540 cal/g. Por que o de vaporização é muito maior?",
+  "conceito": "Fundir só afasta as moléculas o suficiente para elas deslizarem umas sobre as outras. <b>Vaporizar</b> exige romper as ligações que as mantêm unidas no líquido e lançá-las para o estado gasoso — muito mais energia.",
+  "licao": "conta-latente",
+  "alternativas": [
+   {
+    "t": "Porque vaporizar exige romper as ligações entre as moléculas, e fundir apenas afrouxa o arranjo.",
+    "ok": true,
+    "porque": "É a explicação física: na fusão as moléculas continuam próximas; na vaporização elas se separam de vez."
+   },
+   {
+    "t": "Porque a vaporização acontece em temperatura mais alta.",
+    "ok": false,
+    "porque": "Calor latente é medido a temperatura constante. O valor maior não vem da temperatura, mas da energia por grama."
+   },
+   {
+    "t": "Porque a água ferve a 100 °C e derrete a 0 °C, e a diferença é 100.",
+    "ok": false,
+    "porque": "Confunde temperatura com energia. 540 e 80 são cal/g, não graus."
+   },
+   {
+    "t": "Porque o vapor ocupa menos volume que o líquido.",
+    "ok": false,
+    "porque": "É o contrário: o vapor ocupa muito mais volume. E isso não explicaria o valor maior."
+   },
+   {
+    "t": "Porque a fusão do gelo libera calor em vez de absorver.",
+    "ok": false,
+    "porque": "A fusão absorve calor (endotérmica). O sinal não muda o módulo do calor latente."
+   }
+  ]
+ },
+ {
+  "tema": "Calor latente de vaporização",
+  "enunciado": "Quanto calor é necessário para vaporizar 100 g de água já a 100 °C? (L_V = 540 cal/g)",
+  "estrutura": "Q = m · L_V = 100 · 540",
+  "conceito": "Na mudança de estado a fórmula é <b>Q = m·L</b> — não entra ΔT, porque a temperatura não muda durante a vaporização. Use o L correspondente: 540 para vaporizar, 80 para fundir.",
+  "licao": "conta-latente",
+  "alternativas": [
+   {
+    "t": "54 000 cal",
+    "ok": true,
+    "porque": "Q = 100 × 540 = 54 000 cal. A água já está a 100 °C, então não há calor sensível: só o latente da vaporização."
+   },
+   {
+    "t": "8 000 cal",
+    "ok": false,
+    "porque": "Sairia de 100 × 80, usando o calor latente de FUSÃO. Para vaporizar o valor é 540."
+   },
+   {
+    "t": "10 000 cal",
+    "ok": false,
+    "porque": "Sairia de m·c·ΔT com ΔT = 100 °C. Mas a água já está a 100 °C: falta só a mudança de estado."
+   },
+   {
+    "t": "5 400 cal",
+    "ok": false,
+    "porque": "Multiplicou 10 × 540 em vez de 100 × 540. A massa é 100 g."
+   },
+   {
+    "t": "64 000 cal",
+    "ok": false,
+    "porque": "Somou o calor de aquecer de 0 a 100 °C (10 000) com o latente, mas a água já está a 100 °C."
+   }
+  ]
+ },
+ {
+  "tema": "Dilatação térmica",
+  "figura": SVG_DILATACAO,
+  "enunciado": "O que acontece com as dimensões de um corpo quando ele é aquecido?",
+  "conceito": "Ao receber calor, as moléculas vibram mais e se afastam em média. O resultado macroscópico é a <b>dilatação</b>: o corpo aumenta suas dimensões. É por isso que o slide diz que o calor sensível pode alterar as dimensões por dilatação.",
+  "licao": "dilatacao",
+  "alternativas": [
+   {
+    "t": "Aumentam, porque as moléculas se afastam mais em média.",
+    "ok": true,
+    "porque": "Mais agitação → maior distância média entre as moléculas → o corpo cresce em comprimento, área e volume."
+   },
+   {
+    "t": "Diminuem, porque o calor comprime o material.",
+    "ok": false,
+    "porque": "Calor não comprime: afasta as moléculas. Quem diminui as dimensões é o resfriamento (contração)."
+   },
+   {
+    "t": "Não mudam, porque a massa é a mesma.",
+    "ok": false,
+    "porque": "A massa se conserva, mas o comprimento e o volume mudam. São coisas distintas."
+   },
+   {
+    "t": "Aumentam apenas em líquidos.",
+    "ok": false,
+    "porque": "Sólidos, líquidos e gases dilatam. Nos gases o efeito é bem maior."
+   },
+   {
+    "t": "Depende só da cor do material.",
+    "ok": false,
+    "porque": "Depende do coeficiente de dilatação, da dimensão inicial e da variação de temperatura — não da cor."
+   }
+  ]
+ },
+ {
+  "tema": "Dilatação térmica",
+  "enunciado": "A fórmula da dilatação linear de um sólido é:",
+  "estrutura": "ΔL = L₀ · α · ΔT",
+  "conceito": "Dilatação <b>linear</b> é a variação de comprimento. ΔL é quanto variou, L₀ o comprimento inicial, α o coeficiente linear do material e ΔT a variação de temperatura. α muda de material para material.",
+  "licao": "dilatacao",
+  "alternativas": [
+   {
+    "t": "ΔL = L₀ · α · ΔT",
+    "ok": true,
+    "porque": "É a fórmula da dilatação linear: a variação do comprimento é proporcional ao comprimento inicial, ao coeficiente do material e à variação de temperatura."
+   },
+   {
+    "t": "ΔL = m · c · ΔT",
+    "ok": false,
+    "porque": "Essa é a do calor sensível. Ela dá energia (cal), não comprimento."
+   },
+   {
+    "t": "ΔL = L₀ / (α · ΔT)",
+    "ok": false,
+    "porque": "Inverte as grandezas. Dividir comprimento por coeficiente e temperatura não daria comprimento."
+   },
+   {
+    "t": "ΔL = β · γ · L₀",
+    "ok": false,
+    "porque": "Mistura os coeficientes superficial e volumétrico. A linear usa apenas α."
+   },
+   {
+    "t": "ΔL = P · Δt",
+    "ok": false,
+    "porque": "Essa é a potência térmica (energia por tempo), sem relação com comprimento."
+   }
+  ]
+ },
+ {
+  "tema": "Dilatação térmica",
+  "enunciado": "Nas dilatações superficial e volumétrica, a relação entre os coeficientes é:",
+  "estrutura": "β = 2α        γ = 3α",
+  "conceito": "O coeficiente linear é α. A área cresce em duas direções, então <b>β = 2α</b>. O volume cresce em três direções, então <b>γ = 3α</b>. É um atalho que evita decorar três coeficientes.",
+  "licao": "dilatacao",
+  "alternativas": [
+   {
+    "t": "β = 2α e γ = 3α",
+    "ok": true,
+    "porque": "A superfície se dilata em duas dimensões (dobra) e o volume em três (triplica), em relação ao coeficiente linear."
+   },
+   {
+    "t": "β = α e γ = α",
+    "ok": false,
+    "porque": "Assim não haveria diferença entre linear, superficial e volumétrico, o que é falso."
+   },
+   {
+    "t": "β = 3α e γ = 2α",
+    "ok": false,
+    "porque": "Inverteu: quem triplica é o volumétrico (γ) e quem dobra é o superficial (β)."
+   },
+   {
+    "t": "β = α/2 e γ = α/3",
+    "ok": false,
+    "porque": "Diminuiria os coeficientes, quando dilatar em mais dimensões aumenta o efeito."
+   },
+   {
+    "t": "β = α² e γ = α³",
+    "ok": false,
+    "porque": "Elevar o coeficiente ao quadrado não tem significado físico: a relação é de proporção (2 e 3), não de potência."
+   }
+  ]
+ },
+ {
+  "tema": "Dilatação térmica",
+  "enunciado": "Uma barra de alumínio tem 2 m a 20 °C e é aquecida a 120 °C. Qual é a dilatação linear? (α = 2,4×10⁻⁵ °C⁻¹)",
+  "estrutura": "ΔL = L₀ · α · ΔT = 2 · 2,4×10⁻⁵ · 100",
+  "conceito": "Aplique ΔL = L₀·α·ΔT com tudo na mesma unidade. A variação de temperatura é 120 − 20 = 100 °C. O resultado sai em metros.",
+  "licao": "dilatacao",
+  "alternativas": [
+   {
+    "t": "4,8×10⁻³ m (0,48 cm)",
+    "ok": true,
+    "porque": "ΔL = 2 × 2,4×10⁻⁵ × 100 = 4,8×10⁻³ m, cerca de 4,8 mm. Dilatação de sólidos é sempre pequena assim."
+   },
+   {
+    "t": "2,4×10⁻³ m",
+    "ok": false,
+    "porque": "Saiu de usar ΔT = 50 em vez de 100, ou esquecer o fator 2 do comprimento inicial."
+   },
+   {
+    "t": "4,8×10⁻⁵ m",
+    "ok": false,
+    "porque": "Faltou multiplicar pela variação de temperatura (100): ficou só L₀·α."
+   },
+   {
+    "t": "4,8 m",
+    "ok": false,
+    "porque": "Ordem de grandeza absurda: significaria a barra dobrar de tamanho. O coeficiente é 10⁻⁵, então a resposta é milimétrica."
+   },
+   {
+    "t": "0,48 m",
+    "ok": false,
+    "porque": "Erro de potência de dez. O valor correto é 4,8×10⁻³ m, que equivale a 0,48 cm (não 0,48 m)."
+   }
+  ]
+ },
+ {
+  "tema": "Unidades de calor",
+  "enunciado": "Um enunciado dá o calor específico em cal/g·°C e a massa em gramas. Para obter a energia em joule, você deve:",
+  "conceito": "<b>Não misture unidades.</b> Se usar cal/g·°C, a resposta sai em calorias. Para obter joule, converta no final com <b>1 cal ≈ 4,18 J</b> — ou use o calor específico em J/kg·°C com massa em kg.",
+  "licao": "unidades-calor",
+  "alternativas": [
+   {
+    "t": "Calcular em caloria e depois multiplicar por 4,18 para obter joule.",
+    "ok": true,
+    "porque": "1 cal ≈ 4,18 J. O caminho mais seguro é obter o resultado em cal e converter no final."
+   },
+   {
+    "t": "Dividir o resultado por 4,18.",
+    "ok": false,
+    "porque": "Isso converte joule para caloria. Como 1 cal vale mais que 1 J, para obter joule o número precisa crescer — então multiplica."
+   },
+   {
+    "t": "Somar 4,18 ao resultado.",
+    "ok": false,
+    "porque": "Conversão de unidade é proporção (multiplicar/dividir), nunca soma."
+   },
+   {
+    "t": "Ignorar a conversão: cal e joule são a mesma unidade.",
+    "ok": false,
+    "porque": "São unidades diferentes, com 1 cal ≈ 4,18 J. Tratá-las como iguais é um dos erros mais comuns."
+   },
+   {
+    "t": "Usar 273 como fator de conversão.",
+    "ok": false,
+    "porque": "273 é o deslocamento entre Celsius e kelvin (temperatura), não entre caloria e joule (energia)."
+   }
+  ]
+ },
+ {
+  "tema": "Unidades de calor",
+  "enunciado": "Em uma questão que usa c em J/kg·K, os valores correspondentes de massa e de ΔT devem ser dados em:",
+  "conceito": "A unidade manda: se o calor específico está em <b>J/kg·K</b>, a massa vai em <b>kg</b> e a temperatura em <b>kelvin</b> (a variação em K é igual à em °C). O resultado sai em joule, sem conversão no final.",
+  "licao": "unidades-calor",
+  "alternativas": [
+   {
+    "t": "Quilograma e kelvin (ou °C na variação), para o resultado sair em joule.",
+    "ok": true,
+    "porque": "Casando as unidades não há conversão no final. Como ΔT em kelvin é numericamente igual em Celsius, a variação pode ficar em °C."
+   },
+   {
+    "t": "Grama e kelvin, para o resultado sair em joule.",
+    "ok": false,
+    "porque": "Com massa em grama e c em J/kg·K, o resultado sairia com fator 1000 errado. O prefixo k manda usar kg."
+   },
+   {
+    "t": "Qualquer unidade, a conversão é sempre 273.",
+    "ok": false,
+    "porque": "273 é entre Celsius e kelvin. Não resolve erro de massa em grama contra kg."
+   },
+   {
+    "t": "Quilograma e fahrenheit, porque a escala é absoluta.",
+    "ok": false,
+    "porque": "Fahrenheit não é a escala usada com kelvin, e não é absoluta."
+   },
+   {
+    "t": "Grama e °C, como nas questões em caloria.",
+    "ok": false,
+    "porque": "Essas unidades casam com cal/g·°C, não com J/kg·K."
+   }
+  ]
+ },
+ {
+  "tema": "Trocas de calor (cálculo)",
+  "enunciado": "Misturam-se 200 g de água a 60 °C com 200 g de água a 20 °C, num recipiente que não troca calor com o ambiente. A temperatura final será:",
+  "estrutura": "200·(T − 60) + 200·(T − 20) = 0",
+  "conceito": "Massas e calores específicos iguais: a temperatura de equilíbrio é a <b>média aritmética</b> das temperaturas. Quando os corpos são diferentes, monte Q_recebido + Q_cedido = 0 e resolva.",
+  "licao": "conta-trocas",
+  "alternativas": [
+   {
+    "t": "40 °C",
+    "ok": true,
+    "porque": "(60 + 20)/2 = 40 °C. Com massas e substâncias iguais, a mais quente cede exatamente o que a mais fria recebe."
+   },
+   {
+    "t": "80 °C",
+    "ok": false,
+    "porque": "Somar as temperaturas não faz sentido: a mistura não pode ficar mais quente que a água mais quente."
+   },
+   {
+    "t": "30 °C",
+    "ok": false,
+    "porque": "Sairia se as massas fossem diferentes. Aqui são 200 g contra 200 g, então a média simples vale."
+   },
+   {
+    "t": "60 °C",
+    "ok": false,
+    "porque": "Seria como se a água fria não influenciasse, contrariando a igualdade de massas."
+   },
+   {
+    "t": "20 °C",
+    "ok": false,
+    "porque": "Seria como se a água quente não tivesse calor para ceder."
+   }
+  ]
+ }
+];
+
+/* ============================================================
+   AULAS — uma pagina explicativa por assunto
+   ============================================================ */
+const LICOES = {
+ "calor-equilibrio": {
+  "titulo": "Calor, temperatura e equilíbrio térmico",
+  "resumo": "Calor não é o que o corpo tem: é energia que passa. Temperatura é o que o corpo tem. Confundir os dois é o erro número 1 da matéria.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A diferença que resolve tudo"
+   },
+   {
+    "t": "p",
+    "v": "<b>Temperatura</b> mede o grau de agitação das moléculas — é uma propriedade do corpo, que dá para medir com termômetro. <b>Calor</b> é energia térmica <b>em trânsito</b>: só existe enquanto está passando de um corpo para outro."
+   },
+   {
+    "t": "destaque",
+    "v": "Um corpo não \"tem calor\". Ele tem temperatura e energia interna. Calor é o nome do processo de transferência."
+   },
+   {
+    "t": "h",
+    "v": "Para onde o calor vai"
+   },
+   {
+    "t": "p",
+    "v": "Espontaneamente, sempre do corpo de <b>maior temperatura</b> para o de <b>menor temperatura</b>. Note: temperatura, não massa nem tamanho. Uma panela pequena fervendo cede calor para uma bacia grande de água fria."
+   },
+   {
+    "t": "h",
+    "v": "Equilíbrio térmico"
+   },
+   {
+    "t": "p",
+    "v": "Quando as duas temperaturas se igualam, a troca líquida de calor para. É o equilíbrio térmico. Não significa que o calor \"acabou\" — significa que o fluxo nos dois sentidos se compensa."
+   },
+   {
+    "t": "h",
+    "v": "Calorimetria"
+   },
+   {
+    "t": "p",
+    "v": "É a parte da Física que estuda essas trocas de calor. Seu slide lista os quatro objetivos do capítulo: definir calor, capacidade térmica, calor latente e calor sensível, e verificar a troca entre corpos."
+   }
+  ],
+  "erros": [
+   "Dizer que um corpo \"tem muito calor\" — o correto é que ele tem temperatura alta.",
+   "Achar que o corpo maior sempre cede calor: depende da temperatura.",
+   "Pensar que no equilíbrio térmico o calor parou de existir: ele apenas deixou de ter fluxo líquido."
+  ]
+ },
+ "sensivel-latente": {
+  "titulo": "Calor sensível e calor latente",
+  "resumo": "Dois calores, duas fórmulas. Sensível mexe no termômetro. Latente mexe no estado físico — e o termômetro não muda.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "Calor sensível"
+   },
+   {
+    "t": "p",
+    "v": "É o calor que <b>altera a temperatura</b> do corpo. O nome vem de \"sensível\" porque você sente no termômetro. Pode também alterar as dimensões, por dilatação."
+   },
+   {
+    "t": "formula",
+    "v": "Q = m · c · ΔT",
+    "leg": "m: massa · c: calor específico · ΔT: variação de temperatura"
+   },
+   {
+    "t": "h",
+    "v": "Calor latente"
+   },
+   {
+    "t": "p",
+    "v": "É o calor que <b>muda o estado físico</b> sem mudar a temperatura. \"Latente\" quer dizer escondido: o calor entra, mas o termômetro não se mexe."
+   },
+   {
+    "t": "formula",
+    "v": "Q = m · L",
+    "leg": "L: calor latente de fusão ou de vaporização"
+   },
+   {
+    "t": "h",
+    "v": "O macete"
+   },
+   {
+    "t": "destaque",
+    "v": "Sensível = você sente (o termômetro muda). Latente = fica escondido (a temperatura não muda, mas o gelo vira água)."
+   },
+   {
+    "t": "h",
+    "v": "Por que o gelo derretendo não esquenta"
+   },
+   {
+    "t": "p",
+    "v": "Enquanto houver gelo a 0 °C derretendo, todo o calor recebido vai para quebrar o arranjo do sólido. A temperatura fica travada em 0 °C. Ela só começa a subir depois que o último pedaço de gelo virar água."
+   },
+   {
+    "t": "h",
+    "v": "Valores da água (use os da prova se forem dados)"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Fusão: L = 80 cal/g (derreter gelo a 0 °C)",
+     "Vaporização: L = 540 cal/g (ferver água a 100 °C)"
+    ]
+   },
+   {
+    "t": "p",
+    "v": "Vaporizar custa muito mais que fundir porque é preciso separar as moléculas de vez, não apenas afrouxar o arranjo."
+   }
+  ],
+  "erros": [
+   "Usar Q = m·c·ΔT durante a mudança de estado — ali é Q = m·L.",
+   "Achar que o gelo a 0 °C derretendo esquenta: a temperatura fica constante.",
+   "Trocar o L de fusão (80) pelo de vaporização (540)."
+  ]
+ },
+ "especifico-capacidade": {
+  "titulo": "Calor específico e capacidade térmica",
+  "resumo": "Duas grandezas parecidas com nomes diferentes: uma é por grama (do material), a outra é do corpo inteiro (depende da massa).",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "Calor específico (c)"
+   },
+   {
+    "t": "p",
+    "v": "É a quantidade de calor necessária para que <b>cada grama</b> da substância varie 1 °C. Depende só do material — é uma propriedade da substância."
+   },
+   {
+    "t": "formula",
+    "v": "c em cal/g·°C",
+    "leg": "Tabela da aula"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Água: 1,00",
+     "Gelo: 0,50",
+     "Alumínio: 0,21",
+     "Areia: 0,20",
+     "Vidro: 0,16",
+     "Aço: 0,10",
+     "Ouro: 0,03"
+    ]
+   },
+   {
+    "t": "p",
+    "v": "Quanto <b>menor</b> o c, mais rápido o material esquenta com o mesmo calor. O ouro (0,03) esquenta muito mais depressa que a água (1,00)."
+   },
+   {
+    "t": "h",
+    "v": "Capacidade térmica (C)"
+   },
+   {
+    "t": "p",
+    "v": "É a quantidade de calor para o <b>corpo todo</b> variar 1 °C. Depende da massa: uma panela cheia tem capacidade maior que uma vazia, do mesmo material."
+   },
+   {
+    "t": "formula",
+    "v": "C = Q / ΔT        e        C = m · c",
+    "leg": "Unidade: cal/°C"
+   },
+   {
+    "t": "h",
+    "v": "A relação entre as duas"
+   },
+   {
+    "t": "p",
+    "v": "Substituindo Q = m·c·ΔT em C = Q/ΔT, sobra <b>C = m·c</b>. Ou seja: capacidade térmica é massa vezes calor específico."
+   },
+   {
+    "t": "destaque",
+    "v": "c é do material (cal/g·°C). C é do corpo (cal/°C). Se a pergunta fala \"da substância\", é c; se fala \"desse corpo\", é C."
+   },
+   {
+    "t": "h",
+    "v": "Por que a água é especial"
+   },
+   {
+    "t": "p",
+    "v": "Ela tem o maior calor específico da tabela. Por isso demora a esquentar e demora a esfriar — o que é ótimo para o clima litorâneo e para o motor do carro."
+   }
+  ],
+  "erros": [
+   "Trocar c por C na hora de calcular.",
+   "Esquecer de multiplicar pela massa ao pedir capacidade térmica.",
+   "Achar que a água esquenta rápido: ela é a mais lenta da tabela."
+  ]
+ },
+ "trocas": {
+  "titulo": "Trocas de calor: o balanço de energia",
+  "resumo": "Em recipiente isolado, o calor que um corpo perde é exatamente o que o outro ganha. Some tudo e o resultado é zero.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "O princípio"
+   },
+   {
+    "t": "p",
+    "v": "Num sistema fechado (que não troca calor com o ambiente), a energia se conserva. Então o que sai de um corpo entra em outro:"
+   },
+   {
+    "t": "formula",
+    "v": "Q_recebido + Q_cedido = 0"
+   },
+   {
+    "t": "p",
+    "v": "Isso decorre da <b>conservação da energia</b> — não é uma lei nova de calor, é a mesma conservação aplicada a energia térmica."
+   },
+   {
+    "t": "h",
+    "v": "Como montar a conta"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Escreva Q = m·c·ΔT para cada corpo.",
+     "Use ΔT = final − inicial em todos (o corpo que esfria fica negativo automaticamente).",
+     "Some as expressões e iguale a zero.",
+     "Resolva para a temperatura final."
+    ]
+   },
+   {
+    "t": "h",
+    "v": "Atalho: massas iguais"
+   },
+   {
+    "t": "destaque",
+    "v": "Se as massas e as substâncias forem iguais, a temperatura de equilíbrio é a média aritmética das temperaturas iniciais."
+   },
+   {
+    "t": "p",
+    "v": "Exemplo: 200 g de água a 60 °C com 200 g a 20 °C → T = (60+20)/2 = 40 °C. Se as massas forem diferentes, a média não vale: use a equação."
+   }
+  ],
+  "erros": [
+   "Somar os calores sem trocar o sinal do que cede.",
+   "Usar a média simples com massas diferentes.",
+   "Esquecer que ΔT é sempre final − inicial."
+  ]
+ },
+ "potencia": {
+  "titulo": "Potência térmica",
+  "resumo": "Potência mede rapidez, não quantidade. Diz quanto calor por segundo, e não quanto calor no total.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A definição"
+   },
+   {
+    "t": "p",
+    "v": "A potência térmica mede a <b>rapidez</b> com que o calor é trocado entre dois corpos. É a quantidade de calor dividida pelo tempo gasto."
+   },
+   {
+    "t": "formula",
+    "v": "P = Q / Δt",
+    "leg": "Se Q em cal e Δt em s, então P em cal/s"
+   },
+   {
+    "t": "h",
+    "v": "Invertendo a fórmula"
+   },
+   {
+    "t": "p",
+    "v": "Se o problema dá potência e tempo e pede o calor, multiplique em vez de dividir:"
+   },
+   {
+    "t": "formula",
+    "v": "Q = P · Δt"
+   },
+   {
+    "t": "h",
+    "v": "Calor é energia: potência é energia por tempo"
+   },
+   {
+    "t": "p",
+    "v": "No SI, energia em joule e tempo em segundo dão potência em <b>watt</b> (W). Com caloria e segundo, dá cal/s. O raciocínio é o mesmo."
+   },
+   {
+    "t": "destaque",
+    "v": "Duas fontes que entregam a mesma energia, uma em 10 s e outra em 100 s, têm potências diferentes — mas o calor total é igual."
+   }
+  ],
+  "erros": [
+   "Confundir potência com calor total.",
+   "Multiplicar quando o problema pede dividir (leia se ele dá Q e Δt, ou P e Δt).",
+   "Misturar cal com joule sem converter."
+  ]
+ },
+ "conta-sensivel": {
+  "titulo": "Contas de calor sensível",
+  "resumo": "Q = m·c·ΔT. O segredo é a variação de temperatura (final menos inicial) e a unidade da massa.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A fórmula e o que é cada letra"
+   },
+   {
+    "t": "formula",
+    "v": "Q = m · c · ΔT"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Q: quantidade de calor (cal)",
+     "m: massa (g, se c está em cal/g·°C)",
+     "c: calor específico (cal/g·°C)",
+     "ΔT: variação de temperatura (final − inicial)"
+    ]
+   },
+   {
+    "t": "h",
+    "v": "Passo a passo"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Calcule ΔT = T_final − T_inicial (nunca o contrário).",
+     "Confira se a massa está em grama quando c está em cal/g·°C.",
+     "Multiplique os três valores.",
+     "Se o enunciado pedir joule, multiplique o resultado por 4,18."
+    ]
+   },
+   {
+    "t": "h",
+    "v": "Exemplo resolvido"
+   },
+   {
+    "t": "p",
+    "v": "Aquecer 200 g de água de 20 °C a 70 °C:"
+   },
+   {
+    "t": "formula",
+    "v": "Q = 200 · 1 · (70 − 20) = 10 000 cal"
+   },
+   {
+    "t": "destaque",
+    "v": "ΔT é a variação, não a temperatura final. Esse é o erro mais comum da matéria."
+   }
+  ],
+  "erros": [
+   "Usar a temperatura final em vez de ΔT.",
+   "Inverter ΔT (inicial − final).",
+   "Deixar a massa em kg com c em cal/g·°C."
+  ]
+ },
+ "conta-capacidade": {
+  "titulo": "Contas de capacidade térmica",
+  "resumo": "Duas fórmulas, dois caminhos: C = m·c quando você tem massa e material, C = Q/ΔT quando tem calor e variação.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "Os dois caminhos"
+   },
+   {
+    "t": "formula",
+    "v": "C = m · c",
+    "leg": "Se o problema dá a massa e o calor específico"
+   },
+   {
+    "t": "formula",
+    "v": "C = Q / ΔT",
+    "leg": "Se o problema dá o calor recebido e a variação de temperatura"
+   },
+   {
+    "t": "h",
+    "v": "Exemplo 1 — com massa e material"
+   },
+   {
+    "t": "p",
+    "v": "500 g de alumínio (c = 0,21 cal/g·°C):"
+   },
+   {
+    "t": "formula",
+    "v": "C = 500 · 0,21 = 105 cal/°C"
+   },
+   {
+    "t": "h",
+    "v": "Exemplo 2 — com calor e variação"
+   },
+   {
+    "t": "p",
+    "v": "Um corpo de C = 40 cal/°C recebe 800 cal. Qual a variação?"
+   },
+   {
+    "t": "formula",
+    "v": "ΔT = Q / C = 800 / 40 = 20 °C"
+   },
+   {
+    "t": "destaque",
+    "v": "A unidade de C é cal/°C — não tem grama. Se a resposta vier em cal/g·°C, você calculou c em vez de C."
+   }
+  ],
+  "erros": [
+   "Dividir m por c em vez de multiplicar.",
+   "Confundir C (corpo, cal/°C) com c (material, cal/g·°C).",
+   "Inverter a razão em ΔT = Q/C."
+  ]
+ },
+ "conta-latente": {
+  "titulo": "Contas de calor latente",
+  "resumo": "Q = m·L, sem ΔT. Durante a mudança de estado a temperatura não muda, então não há variação para colocar na conta.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A fórmula"
+   },
+   {
+    "t": "formula",
+    "v": "Q = m · L",
+    "leg": "L: calor latente (cal/g)"
+   },
+   {
+    "t": "p",
+    "v": "Note o que <b>não</b> aparece: o calor específico e a variação de temperatura. Isso confirma que a temperatura fica constante."
+   },
+   {
+    "t": "h",
+    "v": "Qual L usar"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "<b>Fusão</b> (sólido → líquido): L = 80 cal/g para a água",
+     "<b>Vaporização</b> (líquido → gasoso): L = 540 cal/g para a água",
+     "<b>Solidificação</b> e <b>condensação</b>: mesmo valor, sinal trocado"
+    ]
+   },
+   {
+    "t": "h",
+    "v": "Exemplo resolvido"
+   },
+   {
+    "t": "p",
+    "v": "Fundir 300 g de gelo a 0 °C:"
+   },
+   {
+    "t": "formula",
+    "v": "Q = 300 · 80 = 24 000 cal"
+   },
+   {
+    "t": "h",
+    "v": "E se o gelo estiver a −10 °C?"
+   },
+   {
+    "t": "p",
+    "v": "Aí há duas etapas: primeiro <b>aquecer</b> o gelo até 0 °C (calor sensível, com c do gelo = 0,50) e depois <b>derreter</b> (calor latente). Some os dois."
+   },
+   {
+    "t": "destaque",
+    "v": "Mudança de estado usa Q = m·L. Aquecimento dentro de uma mesma fase usa Q = m·c·ΔT. Se a questão envolve as duas, some os resultados."
+   }
+  ],
+  "erros": [
+   "Usar Q = m·c·ΔT na mudança de estado.",
+   "Usar L = 540 quando o problema pede fusão.",
+   "Esquecer de somar o calor sensível quando a temperatura inicial não é a da mudança."
+  ]
+ },
+ "conta-trocas": {
+  "titulo": "Contas de trocas de calor",
+  "resumo": "Monte uma equação só: a soma dos calores é zero. Com massas iguais, a temperatura final é a média.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A equação"
+   },
+   {
+    "t": "formula",
+    "v": "Q₁ + Q₂ + Q₃ + ... = 0",
+    "leg": "Cada Q = m·c·(T_final − T_inicial)"
+   },
+   {
+    "t": "h",
+    "v": "Exemplo resolvido"
+   },
+   {
+    "t": "p",
+    "v": "100 g de água a 80 °C com 300 g a 20 °C:"
+   },
+   {
+    "t": "formula",
+    "v": "100·(T − 80) + 300·(T − 20) = 0"
+   },
+   {
+    "t": "formula",
+    "v": "100T − 8000 + 300T − 6000 = 0  →  400T = 14 000  →  T = 35 °C"
+   },
+   {
+    "t": "p",
+    "v": "Repare que o resultado (35 °C) fica mais perto de 20 °C, porque a massa fria é maior. Faz sentido."
+   },
+   {
+    "t": "h",
+    "v": "O atalho da média"
+   },
+   {
+    "t": "destaque",
+    "v": "Só vale quando as massas e as substâncias são iguais: T = (T₁ + T₂)/2."
+   },
+   {
+    "t": "p",
+    "v": "Ouro e água misturados, ou massas diferentes, exigem a equação completa."
+   }
+  ],
+  "erros": [
+   "Usar a média simples com massas diferentes.",
+   "Trocar o sinal de quem cede calor.",
+   "Esquecer o calor específico quando as substâncias são diferentes."
+  ]
+ },
+ "conta-potencia": {
+  "titulo": "Contas de potência térmica",
+  "resumo": "P = Q/Δt. Dependendo do que o problema dá, você divide ou multiplica.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "As duas formas"
+   },
+   {
+    "t": "formula",
+    "v": "P = Q / Δt",
+    "leg": "Quando você tem o calor e o tempo"
+   },
+   {
+    "t": "formula",
+    "v": "Q = P · Δt",
+    "leg": "Quando você tem a potência e o tempo"
+   },
+   {
+    "t": "h",
+    "v": "Exemplo 1"
+   },
+   {
+    "t": "p",
+    "v": "Uma fonte fornece 6 000 cal em 20 s:"
+   },
+   {
+    "t": "formula",
+    "v": "P = 6 000 / 20 = 300 cal/s"
+   },
+   {
+    "t": "h",
+    "v": "Exemplo 2"
+   },
+   {
+    "t": "p",
+    "v": "Uma fonte de 200 cal/s funciona 30 s. Quanto calor forneceu?"
+   },
+   {
+    "t": "formula",
+    "v": "Q = 200 · 30 = 6 000 cal"
+   },
+   {
+    "t": "destaque",
+    "v": "Leia o enunciado e pergunte: ele quer \"por segundo\" (potência) ou \"no total\" (calor)? Isso decide se você divide ou multiplica."
+   }
+  ],
+  "erros": [
+   "Multiplicar quando devia dividir.",
+   "Errar potência de dez ao escrever números grandes.",
+   "Trocar o tempo da questão (20 s por 2 s, por exemplo)."
+  ]
+ },
+ "conta-sinal": {
+  "titulo": "Sinal do calor",
+  "resumo": "ΔT é sempre final menos inicial. Se o corpo esfria, o resultado sai negativo — e o sinal tem significado: calor cedido.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A regra"
+   },
+   {
+    "t": "formula",
+    "v": "ΔT = T_final − T_initial  →  Q = m · c · ΔT"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Corpo <b>esquenta</b>: ΔT positivo → Q positivo → <b>recebeu</b> calor",
+     "Corpo <b>esfria</b>: ΔT negativo → Q negativo → <b>cedeu</b> calor"
+    ]
+   },
+   {
+    "t": "h",
+    "v": "Exemplo"
+   },
+   {
+    "t": "p",
+    "v": "50 g de água esfriam de 40 °C para 30 °C:"
+   },
+   {
+    "t": "formula",
+    "v": "Q = 50 · 1 · (30 − 40) = −500 cal"
+   },
+   {
+    "t": "p",
+    "v": "O sinal negativo não é erro: significa que a água perdeu 500 cal para o ambiente."
+   },
+   {
+    "t": "destaque",
+    "v": "Nunca inverta para \"deixar positivo\". O sinal carrega informação: diz de que lado o calor foi."
+   }
+  ],
+  "erros": [
+   "Fazer inicial − final para \"dar positivo\".",
+   "Ignorar o sinal e depois não saber se recebeu ou cedeu.",
+   "Somar corpos que esquentam e esfriam sem respeitar os sinais."
+  ]
+ },
+ "conta-especifico": {
+  "titulo": "Contas de calor específico",
+  "resumo": "Isole c na fórmula: c = Q/(m·ΔT). O valor encontrado identifica o material pela tabela.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "Isolando o c"
+   },
+   {
+    "t": "formula",
+    "v": "Q = m · c · ΔT   →   c = Q / (m · ΔT)"
+   },
+   {
+    "t": "h",
+    "v": "Exemplo resolvido"
+   },
+   {
+    "t": "p",
+    "v": "500 g recebem 1 000 cal e a temperatura sobe 10 °C:"
+   },
+   {
+    "t": "formula",
+    "v": "c = 1000 / (500 · 10) = 0,20 cal/g·°C"
+   },
+   {
+    "t": "p",
+    "v": "Consultando a tabela da aula: 0,20 é o valor da <b>areia</b>."
+   },
+   {
+    "t": "h",
+    "v": "Tabela para identificar"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Água 1,00 · Gelo 0,50 · Alumínio 0,21 · Areia 0,20 · Vidro 0,16 · Aço 0,10 · Ouro 0,03"
+    ]
+   },
+   {
+    "t": "destaque",
+    "v": "Confira a unidade no final: cal/g·°C é calor específico (do material); cal/°C é capacidade térmica (do corpo)."
+   }
+  ],
+  "erros": [
+   "Somar em vez de multiplicar m·ΔT no denominador.",
+   "Confundir o resultado com capacidade térmica.",
+   "Errar a comparação com a tabela por causa da vírgula."
+  ]
+ },
+ "propagacao-calor": {
+  "titulo": "Propagação de calor: condução, convecção e radiação",
+  "resumo": "Três caminhos diferentes. Um precisa de sólido, outro de fluido, e o terceiro atravessa até o vácuo.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "Condução"
+   },
+   {
+    "t": "p",
+    "v": "O calor passa de partícula para partícula <b>sem que o material se desloque</b>. Uma ponta esquenta e a agitação se transmite ao longo da peça."
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Ocorre principalmente em <b>sólidos</b>",
+     "Metais conduzem muito bem; madeira, plástico e ar conduzem mal",
+     "Exemplo: colher de metal na panela, ferro de passar"
+    ]
+   },
+   {
+    "t": "destaque",
+    "v": "Na condução, o material fica no lugar. Só a energia caminha."
+   },
+   {
+    "t": "h",
+    "v": "Convecção"
+   },
+   {
+    "t": "p",
+    "v": "O próprio <b>fluido se move</b>. A parte aquecida fica menos densa e sobe; a mais fria, mais densa, desce. Formam-se correntes."
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Ocorre em <b>líquidos e gases</b>",
+     "Nunca em sólidos (o material não pode circular)",
+     "Exemplo: ar-condicionado no alto, geladeira (freezer em cima), água fervendo"
+    ]
+   },
+   {
+    "t": "h",
+    "v": "Radiação"
+   },
+   {
+    "t": "p",
+    "v": "O calor viaja como <b>onda eletromagnética</b> e não precisa de meio material. É a única que atravessa o vácuo."
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Funciona no <b>vácuo</b> também",
+     "Exemplo: calor do Sol, sensação de calor perto de uma fogueira, forno de micro-ondas e infravermelho"
+    ]
+   },
+   {
+    "t": "h",
+    "v": "A garrafa térmica reúne os três"
+   },
+   {
+    "t": "p",
+    "v": "O <b>vácuo</b> entre as paredes corta condução e convecção (sem matéria, não há nenhuma das duas). A parede <b>espelhada</b> reflete a radiação. Junte as duas soluções e o café fica quente."
+   }
+  ],
+  "erros": [
+   "Dizer que a convecção ocorre em sólidos.",
+   "Achar que a radiação precisa de ar para chegar.",
+   "Trocar condução (partícula a partícula) por convecção (fluido circulando)."
+  ]
+ },
+ "dilatacao": {
+  "titulo": "Dilatação térmica",
+  "resumo": "Aquecer aumenta as dimensões. As fórmulas mudam conforme você mede comprimento, área ou volume — e os coeficientes se relacionam por 2 e 3.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "Por que acontece"
+   },
+   {
+    "t": "p",
+    "v": "Ao receber calor, as moléculas vibram mais e se afastam em média. O corpo cresce. Ao resfriar, o contrário: contrai."
+   },
+   {
+    "t": "h",
+    "v": "Dilatação linear (comprimento)"
+   },
+   {
+    "t": "formula",
+    "v": "ΔL = L₀ · α · ΔT",
+    "leg": "α: coeficiente de dilatação linear do material"
+   },
+   {
+    "t": "h",
+    "v": "Superficial (área) e volumétrica (volume)"
+   },
+   {
+    "t": "formula",
+    "v": "ΔA = A₀ · β · ΔT        ΔV = V₀ · γ · ΔT"
+   },
+   {
+    "t": "h",
+    "v": "A relação entre os coeficientes"
+   },
+   {
+    "t": "formula",
+    "v": "β = 2α        γ = 3α"
+   },
+   {
+    "t": "p",
+    "v": "A área cresce em duas direções, então o coeficiente dobra. O volume cresce em três, então triplica. Só precisa decorar α."
+   },
+   {
+    "t": "h",
+    "v": "Exemplo resolvido"
+   },
+   {
+    "t": "p",
+    "v": "Barra de alumínio de 2 m, de 20 °C a 120 °C (α = 2,4×10⁻⁵):"
+   },
+   {
+    "t": "formula",
+    "v": "ΔL = 2 · 2,4×10⁻⁵ · 100 = 4,8×10⁻³ m ≈ 4,8 mm"
+   },
+   {
+    "t": "destaque",
+    "v": "Dilatação de sólido é sempre pequena — na ordem de milímetros. Resultado de metros indica erro de conta."
+   },
+   {
+    "t": "h",
+    "v": "Onde isso aparece na prática"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "Trilhos de trem com folga entre os segmentos",
+     "Emendas de ponte",
+     "Fios de poste mais soltos no verão",
+     "Tampa de vidro que abre mais fácil sob água quente"
+    ]
+   }
+  ],
+  "erros": [
+   "Usar α na dilatação volumétrica (é γ = 3α).",
+   "Esquecer que ΔT é variação, não temperatura final.",
+   "Trocar a ordem de grandeza (10⁻⁵ vs 10⁻³)."
+  ]
+ },
+ "unidades-calor": {
+  "titulo": "Unidades: caloria e joule",
+  "resumo": "Cal e joule medem a mesma coisa em escalas diferentes. Misturar as duas na mesma conta é o erro que mais aparece em prova.",
+  "blocos": [
+   {
+    "t": "h",
+    "v": "A conversão"
+   },
+   {
+    "t": "formula",
+    "v": "1 cal ≈ 4,18 J",
+    "leg": "Aproximação usada no ensino médio"
+   },
+   {
+    "t": "p",
+    "v": "Como 1 cal vale mais que 1 J, ao passar de caloria para joule o número <b>cresce</b> (multiplica por 4,18). No sentido contrário, diminui (divide)."
+   },
+   {
+    "t": "h",
+    "v": "As duas combinações que funcionam"
+   },
+   {
+    "t": "lista",
+    "v": [
+     "<b>cal</b> + <b>g</b> + <b>°C</b> com c em cal/g·°C → resultado em caloria",
+     "<b>J</b> + <b>kg</b> + <b>K</b> com c em J/kg·K → resultado em joule"
+    ]
+   },
+   {
+    "t": "p",
+    "v": "O importante é casar tudo: a unidade do calor específico dita as unidades da massa e da temperatura."
+   },
+   {
+    "t": "h",
+    "v": "Celsius e kelvin"
+   },
+   {
+    "t": "formula",
+    "v": "T(K) = T(°C) + 273"
+   },
+   {
+    "t": "p",
+    "v": "Para <b>variação</b> de temperatura, o valor é o mesmo nas duas escalas: ΔT de 10 °C é ΔT de 10 K. Só a conversão de temperatura absoluta precisa do 273."
+   },
+   {
+    "t": "destaque",
+    "v": "Não misture: se o c está em cal/g·°C, a massa tem de estar em gramas — senão o resultado sai errado por um fator de 1000."
+   }
+  ],
+  "erros": [
+   "Somar 4,18 em vez de multiplicar.",
+   "Usar massa em kg com c em cal/g·°C.",
+   "Dividir por 4,18 quando quer passar de caloria para joule.",
+   "Trocar o 273 (temperatura) pelo 4,18 (energia)."
+  ]
+ }
+};
+
+// de qual aula cada questao trata (na ordem do array QUESTIONS)
+const LICAO_POR_QUESTAO = QUESTIONS.map(q => q.licao);
+
+const stage   = document.getElementById('stage');
+const fill    = document.getElementById('fill');
+const count   = document.getElementById('count');
+const timerEl = document.getElementById('timer');
+const logEl   = document.getElementById('log');
+const LETTERS = ['a','b','c','d','e'];
+
+const LIMITE_SEG = 50 * 60;      // 50 minutos de prova
+const K_LOG    = 'simulado_calor_log_v1';     // historico de eventos
+const K_SESSAO = 'simulado_calor_sessao_v1';  // marcador de tentativa em andamento
+
+let QUIZ = [];        // versao com alternativas embaralhadas (a que aparece na tela)
+let idx = 0;
+let answers = [];
+let estado = 'intro'; // intro | quiz | done
+let fimEm = 0, inicioEm = 0, tickId = null;
+let pendente = null;  // alternativa selecionada aguardando confirmacao (-1 = pular)
+let tentativa = 0;
+
+/* ---------------- armazenamento seguro ---------------- */
+const mem = {};
+function lsGet(k, def){
+  try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); }
+  catch(e){ return k in mem ? mem[k] : def; }
+}
+function lsSet(k, v){
+  try { localStorage.setItem(k, JSON.stringify(v)); }
+  catch(e){ mem[k] = v; }
+}
+function lsDel(k){
+  try { localStorage.removeItem(k); } catch(e){ delete mem[k]; }
+}
+
+/* ---------------- registro de tentativas ---------------- */
+function logGet(){ const l = lsGet(K_LOG, []); return Array.isArray(l) ? l : []; }
+function logAdd(tipo, nota, extra){
+  const l = logGet();
+  l.push(Object.assign({t: Date.now(), tipo, nota: nota || '', tentativa}, extra || {}));
+  while (l.length > 60) l.shift();
+  lsSet(K_LOG, l);
+  renderLog();
+}
+
+function horaCurta(ts){
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function quando(ts){
+  const diff = Math.round((Date.now() - ts) / 60000);
+  if (diff < 1) return 'agora';
+  if (diff < 60) return 'há ' + diff + ' min';
+  const d = Math.round(diff / 60);
+  if (d < 24) return 'há ' + d + ' h';
+  return 'há ' + Math.round(d / 24) + ' d';
+}
+
+function resumoLog(){
+  const l = logGet();
+  const inicios   = l.filter(e => e.tipo === 'iniciou').length;
+  const reinicios = l.filter(e => e.tipo === 'reiniciou').length;
+  return {
+    inicios,
+    tentativas:  inicios + reinicios,          // toda vez que a prova recomeça, conta
+    reinicios,
+    interrupcoes:l.filter(e => e.tipo === 'interrompeu').length,
+    conclusoes:  l.filter(e => e.tipo === 'concluiu' || e.tipo === 'tempo').length,
+    ultimo:      l.length ? l[l.length - 1].t : 0
+  };
+}
+
+const ROTULO = {
+  iniciou:    '▶ Iniciou',
+  reiniciou:  '↻ Reiniciou',
+  interrompeu:'⏸ Saiu',
+  concluiu:   '✓ Concluiu',
+  tempo:      '⏱ Tempo esgotado'
+};
+
+function renderLog(){
+  const r = resumoLog();
+  const badges = document.getElementById('logBadges');
+  const note   = document.getElementById('logNote');
+  const list   = document.getElementById('logList');
+  const foot   = document.getElementById('logFoot');
+  if (!badges) return;
+
+  const b = [];
+  b.push(`<span class="badge ${r.tentativas?'':'zero'}">Tentativas: ${r.tentativas}</span>`);
+  b.push(`<span class="badge ${r.reinicios?'warn':'zero'}">Reinícios: ${r.reinicios}</span>`);
+  b.push(`<span class="badge ${r.interrupcoes?'bad':'zero'}">Saídas no meio: ${r.interrupcoes}</span>`);
+  b.push(`<span class="badge ${r.conclusoes?'good':'zero'}">Concluídas: ${r.conclusoes}</span>`);
+  if (r.ultimo) b.push(`<span class="badge zero">última: ${quando(r.ultimo)}</span>`);
+  badges.innerHTML = b.join('');
+
+  const total = r.reinicios + r.interrupcoes;
+  if (total > 0){
+    note.hidden = false;
+    note.innerHTML = `Este simulado já foi <b>reiniciado ${r.reinicios}×</b> e <b>interrompido ${r.interrupcoes}×</b> ` +
+      `(sair ou recarregar a página no meio conta como interrupção). O registro fica salvo neste navegador.`;
+  } else {
+    note.hidden = true;
+  }
+
+  const l = logGet().slice().reverse();
+  list.innerHTML = l.map(e => `
+    <li>
+      <span class="log-time">${horaCurta(e.t)}</span>
+      <span class="log-tipo ${e.tipo}">${ROTULO[e.tipo] || e.tipo}</span>
+      <span class="log-nota">${e.nota || ''}</span>
+    </li>`).join('');
+  foot.hidden = !l.length;
+}
+
+/* ---------------- sessao em andamento ---------------- */
+function marcarSessao(){
+  lsSet(K_SESSAO, {
+    inicio: inicioEm, tentativa,
+    idx: idx + 1,
+    respondidas: answers.length,
+    total: QUESTIONS.length,
+    naTela: Date.now()
+  });
+}
+function limparSessao(){ lsDel(K_SESSAO); }
+
+// ao abrir a pagina: se havia tentativa em andamento, isso conta como interrupcao
+function registrarSaidaAnterior(){
+  const s = lsGet(K_SESSAO, null);
+  if (!s) return false;
+  tentativa = s.tentativa || 1;
+  logAdd('interrompeu',
+    `tentativa ${s.tentativa} parada na questão ${s.idx}/${s.total} (${s.respondidas} respondida(s))`,
+    {t: s.naTela || s.inicio});
+  limparSessao();
+  return true;
+}
+
+/* ---------------- embaralhamento equilibrado ---------------- */
+function shuffleArr(a){
+  const r = a.slice();
+  for (let i = r.length - 1; i > 0; i--){
+    const k = Math.floor(Math.random() * (i + 1));
+    [r[i], r[k]] = [r[k], r[i]];
+  }
+  return r;
+}
+
+function montarQuiz(){
+  const n = QUESTIONS.length;
+  const cota = Math.floor(n / 5);
+  const sobra = n % 5;
+  const letras = shuffleArr([0,1,2,3,4]).slice(0, sobra);
+  let pool = [];
+  for (let l = 0; l < 5; l++){
+    const qtd = cota + (letras.includes(l) ? 1 : 0);
+    for (let k = 0; k < qtd; k++) pool.push(l);
+  }
+  pool = shuffleArr(pool);
+
+  return QUESTIONS.map((q, qi) => {
+    const correta = q.alternativas.findIndex(a => a.ok);
+    const erradas = shuffleArr(q.alternativas.map((_, k) => k).filter(k => k !== correta));
+    const alvo = pool[qi];
+    const ordem = [];
+    let pe = 0;
+    for (let pos = 0; pos < q.alternativas.length; pos++){
+      ordem.push(pos === alvo ? correta : erradas[pe++]);
+    }
+    return {
+      tema: q.tema,
+      enunciado: q.enunciado,
+      figura: q.figura,                     // diagrama SVG (sobrevive ao sorteio)
+      estrutura: q.estrutura,
+      conceito: q.conceito,
+      licao: q.licao,                       // aula do assunto (sobrevive ao sorteio)
+      alternativas: ordem.map(k => q.alternativas[k])
+    };
+  });
+}
+
+/* ---------------- cronometro ---------------- */
+function fmt(seg){
+  seg = Math.max(0, Math.round(seg));
+  return String(Math.floor(seg / 60)).padStart(2,'0') + ':' + String(seg % 60).padStart(2,'0');
+}
+function restanteSeg(){ return (fimEm - Date.now()) / 1000; }
+
+function tick(){
+  if (estado !== 'quiz') return;
+  const seg = restanteSeg();
+  timerEl.textContent = fmt(seg);
+  timerEl.classList.toggle('warn',   seg <= 600 && seg > 300);
+  timerEl.classList.toggle('danger', seg <= 300);
+  if (seg <= 0) encerrarPorTempo();
+}
+function iniciarTimer(){
+  inicioEm = Date.now();
+  fimEm = inicioEm + LIMITE_SEG * 1000;
+  timerEl.classList.remove('hidden','warn','danger');
+  timerEl.textContent = fmt(LIMITE_SEG);
+  clearInterval(tickId);
+  tickId = setInterval(tick, 250);
+  tick();
+}
+function pararTimer(){ clearInterval(tickId); tickId = null; timerEl.classList.add('hidden'); }
+
+/* ---------------- telas ---------------- */
+function progress(){
+  const pct = (idx / QUESTIONS.length) * 100;
+  fill.style.width = pct + '%';
+  count.innerHTML = '<b>' + Math.min(idx + 1, QUESTIONS.length) + '</b> / ' + QUESTIONS.length;
+}
+
+function telaInicial(){
+  estado = 'intro';
+  pararTimer();
+  pendente = null;
+  fill.style.width = '0%';
+  count.innerHTML = '<b>' + QUESTIONS.length + '</b> questões';
+  renderLog();
+
+  const r = resumoLog();
+  const aviso = (r.reinicios + r.interrupcoes) > 0
+    ? `<p class="log-note" style="margin-top:16px">Atenção: este simulado já foi reiniciado <b>${r.reinicios}×</b> e interrompido <b>${r.interrupcoes}×</b>. Esse histórico aparece no topo durante toda a prova.</p>`
+    : '';
+
+  stage.innerHTML = `
+    <section class="card">
+      <span class="chip">Antes de começar</span>
+      <p class="q">Simulado de Física (Calorimetria) — <strong>${QUESTIONS.length} questões</strong>, <strong>50 minutos</strong> de prova.</p>
+      <ul class="start-rules">
+        <li>O cronômetro começa em <b>Iniciar simulado</b> e não pausa.</li>
+        <li>Cada resposta pede <b>confirmação</b> antes de revelar o gabarito.</li>
+        <li>Se você sair ou recarregar no meio, isso é <b>registrado</b> no painel de tentativas lá em cima.</li>
+        <li>As alternativas são sorteadas a cada tentativa — a letra correta muda de lugar.</li>
+        <li>Ao chegar em 00:00, o simulado é encerrado e corrigido com o que você já respondeu.</li>
+      </ul>
+      ${aviso}
+      <div class="actions">
+        <span class="hint">Enter também inicia</span>
+        <button class="btn ghost" id="semTimer" type="button">Treinar sem tempo</button>
+        <button class="btn" id="iniciar" type="button">Iniciar simulado</button>
+      </div>
+    </section>`;
+  document.getElementById('iniciar').addEventListener('click', () => comecar(true));
+  document.getElementById('semTimer').addEventListener('click', () => comecar(false));
+}
+
+function comecar(comTempo, motivo){
+  QUIZ = montarQuiz();
+  idx = 0;
+  answers = [];
+  pendente = null;
+  estado = 'quiz';
+  tentativa = resumoLog().tentativas + 1;
+  if (comTempo) iniciarTimer(); else { inicioEm = Date.now(); pararTimer(); }
+
+  logAdd(motivo === 'reiniciou' ? 'reiniciou' : 'iniciou',
+         motivo === 'reiniciou'
+           ? `tentativa ${tentativa} — recomeçou do zero${comTempo ? ' com 50 min' : ' sem tempo'}`
+           : `tentativa ${tentativa} — ${comTempo ? '50 minutos' : 'sem tempo'}`);
+  marcarSessao();
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = QUIZ[idx];
+  progress();
+  pendente = null;
+
+  const opts = q.alternativas.map((a, i) => `
+      <button class="opt" data-i="${i}" type="button">
+        <span class="key">${LETTERS[i]}</span>
+        <span class="txt">${a.t}</span>
+      </button>`).join('');
+
+  stage.innerHTML = `
+    <section class="card">
+      <span class="chip">${q.tema}</span>
+      <p class="q">${q.enunciado}</p>
+      ${q.figura ? q.figura : ''}
+      ${q.estrutura ? `<div class="formula"><span class="lbl">estrutura</span>${q.estrutura}</div>` : ''}
+      <div class="opts" id="opts">${opts}</div>
+      <div id="confirmBox"></div>
+      <div id="fb"></div>
+      <div class="actions">
+        <span class="hint" id="hint">Escolha uma alternativa (teclas 1–5)</span>
+        <button class="btn ghost" id="restart" type="button">Reiniciar</button>
+        <button class="btn ghost" id="skip" type="button">Pular</button>
+        <button class="btn" id="next" type="button" disabled>Próxima</button>
+      </div>
+    </section>`;
+
+  document.getElementById('opts').addEventListener('click', e => {
+    const b = e.target.closest('.opt');
+    if (b && !b.classList.contains('locked')) selecionar(parseInt(b.dataset.i, 10));
+  });
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('skip').addEventListener('click', pedirPular);
+  document.getElementById('restart').addEventListener('click', pedirReinicio);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---- etapa 1: selecionar (nao revela nada) ---- */
+function selecionar(i){
+  const q = QUIZ[idx];
+  const fb = document.getElementById('fb');
+  if (estado !== 'quiz' || (fb && fb.dataset.done)) return;
+  if (i < 0 || i >= q.alternativas.length) return;
+
+  pendente = i;
+
+  document.querySelectorAll('.opt').forEach(el => {
+    el.classList.toggle('sel', parseInt(el.dataset.i, 10) === i);
+  });
+
+  const box = document.getElementById('confirmBox');
+  box.innerHTML = `
+    <div class="confirm">
+      <p class="confirm-q">
+        Confirmar esta resposta?
+        <span class="pick"><b>${LETTERS[i]})</b> ${q.alternativas[i].t}</span>
+      </p>
+      <div class="confirm-btns">
+        <button class="btn ghost" id="trocar" type="button">Trocar</button>
+        <button class="btn" id="confirmar" type="button">Confirmar resposta</button>
+      </div>
+    </div>`;
+  document.getElementById('confirmar').addEventListener('click', confirmar);
+  document.getElementById('trocar').addEventListener('click', limparSelecao);
+  document.getElementById('hint').textContent = 'Confirme para ver o gabarito (Enter confirma)';
+  document.getElementById('confirmar').focus({preventScroll:true});
+}
+
+function limparSelecao(){
+  pendente = null;
+  document.querySelectorAll('.opt').forEach(el => el.classList.remove('sel'));
+  const box = document.getElementById('confirmBox');
+  if (box) box.innerHTML = '';
+  const hint = document.getElementById('hint');
+  if (hint) hint.textContent = 'Escolha uma alternativa (teclas 1–5)';
+}
+
+function confirmar(){
+  if (pendente === null) return;
+  const escolha = pendente;
+  document.getElementById('confirmBox').innerHTML = '';
+  revelar(escolha);
+}
+
+/* ---- pular tambem passa por confirmacao ---- */
+function pedirPular(){
+  const fb = document.getElementById('fb');
+  if (estado !== 'quiz' || (fb && fb.dataset.done)) return;
+  pendente = -1;
+  document.querySelectorAll('.opt').forEach(el => el.classList.remove('sel'));
+  const box = document.getElementById('confirmBox');
+  box.innerHTML = `
+    <div class="confirm">
+      <p class="confirm-q">
+        Pular esta questão? Ela entra como <b>não respondida</b> no resultado.
+      </p>
+      <div class="confirm-btns">
+        <button class="btn ghost" id="trocar" type="button">Voltar</button>
+        <button class="btn danger-btn" id="confirmar" type="button">Pular mesmo assim</button>
+      </div>
+    </div>`;
+  document.getElementById('confirmar').addEventListener('click', confirmar);
+  document.getElementById('trocar').addEventListener('click', limparSelecao);
+  document.getElementById('confirmar').focus({preventScroll:true});
+}
+
+/* ---- reinicio com confirmacao e registro ---- */
+function pedirReinicio(){
+  if (estado !== 'quiz') return;
+  boxReinicio();
+}
+
+function boxReinicio(){
+  const box = document.getElementById('confirmBox');
+  const resp = answers.length;
+  box.innerHTML = `
+    <div class="confirm" style="border-color:var(--no-line);background:var(--no-soft)">
+      <p class="confirm-q">
+        Reiniciar o simulado? Você está na <b>questão ${idx + 1} de ${QUESTIONS.length}</b> com
+        <b>${resp} resposta(s)</b> registrada(s). Tudo é apagado e o reinício fica marcado no
+        painel de registro do topo.
+      </p>
+      <div class="confirm-btns">
+        <button class="btn ghost" id="trocar" type="button">Cancelar</button>
+        <button class="btn danger-btn" id="confirmar" type="button">Sim, reiniciar</button>
+      </div>
+    </div>`;
+  document.getElementById('confirmar').addEventListener('click', () => {
+    comecar(true, 'reiniciou');
+  });
+  document.getElementById('trocar').addEventListener('click', () => {
+    if (pendente === null) limparSelecao(); else selecionar(pendente);
+  });
+  document.getElementById('confirmar').focus({preventScroll:true});
+}
+
+/* ---- etapa 2: revelar gabarito ---- */
+function revelar(chosen){
+  if (estado !== 'quiz') return;
+  const q = QUIZ[idx];
+  const fb = document.getElementById('fb');
+  if (fb.dataset.done) return;
+  fb.dataset.done = '1';
+
+  const ok = chosen >= 0 && q.alternativas[chosen].ok;
+  answers.push({i: idx, chosen, ok, tema: q.tema});
+  pendente = null;
+  marcarSessao();
+
+  document.querySelectorAll('.opt').forEach(el => {
+    const i = parseInt(el.dataset.i, 10);
+    const a = q.alternativas[i];
+    el.classList.remove('sel');
+    el.classList.add('locked');
+    if (a.ok){
+      el.classList.add('correct');
+      el.insertAdjacentHTML('beforeend', '<span class="mark">✓</span>');
+    } else if (i === chosen){
+      el.classList.add('wrong');
+      el.insertAdjacentHTML('beforeend', '<span class="mark">✕</span>');
+    } else {
+      el.classList.add('dim');
+    }
+  });
+
+  const why = q.alternativas.map((a, i) => {
+    const cls = a.ok ? 'good' : 'bad';
+    const picked = i === chosen ? ' picked' : '';
+    return `<li class="${cls}${picked}"><b class="lbl">${LETTERS[i]}</b>${a.porque}</li>`;
+  }).join('');
+
+  const verdict = chosen === -1
+    ? `<div class="verdict no">⏭ Você pulou esta questão</div>`
+    : ok
+      ? `<div class="verdict ok">✓ Resposta correta</div>`
+      : `<div class="verdict no">✕ Resposta incorreta — a correta é a letra ${LETTERS[q.alternativas.findIndex(a => a.ok)]}</div>`;
+
+  const lic = LICOES[q.licao];
+  const btnAula = lic ? `
+    <button class="lesson-btn" id="abrirAula" type="button">
+      <span class="ico">📘</span>
+      <span class="lbl">Aprender o assunto do zero
+        <small>${lic.titulo}</small></span>
+      <span class="arrow">→</span>
+    </button>` : '';
+
+  fb.innerHTML = `
+    <div class="fb">
+      ${verdict}
+      <p class="concept">${q.conceito}</p>
+      <ul class="why">${why}</ul>
+      ${btnAula}
+    </div>`;
+
+  const abrir = document.getElementById('abrirAula');
+  if (abrir) abrir.addEventListener('click', () => abrirLicao(q.licao));
+
+  const nextBtn = document.getElementById('next');
+  nextBtn.disabled = false;
+  nextBtn.textContent = (idx === QUESTIONS.length - 1) ? 'Ver resultado' : 'Próxima';
+  document.getElementById('skip').style.display = 'none';
+  document.getElementById('hint').textContent = ok ? 'Boa. Enter para continuar.' : 'Leia as explicações e siga com Enter.';
+  nextBtn.focus({preventScroll:true});
+}
+
+function next(){
+  const fb = document.getElementById('fb');
+  if (!fb || !fb.dataset.done) return;
+  idx++;
+  if (idx >= QUESTIONS.length) return results();
+  marcarSessao();
+  renderQuestion();
+}
+
+function encerrarPorTempo(){
+  pararTimer();
+  results(true);
+}
+
+function results(porTempo){
+  estado = 'done';
+  pararTimer();
+  limparSessao();
+
+  const segUsados = porTempo ? LIMITE_SEG : Math.min(LIMITE_SEG, Math.round((Date.now() - inicioEm) / 1000));
+  fill.style.width = '100%';
+
+  const right = answers.filter(a => a.ok).length;
+  const total = QUESTIONS.length;
+  const pct = Math.round((right / total) * 100);
+  const semResposta = total - answers.length;
+
+  logAdd(porTempo ? 'tempo' : 'concluiu',
+         `tentativa ${tentativa} — ${right}/${total} (${pct}%) em ${fmt(segUsados)}`);
+
+  const byTheme = {};
+  answers.forEach(a => {
+    byTheme[a.tema] = byTheme[a.tema] || {t:0, ok:0};
+    byTheme[a.tema].t++;
+    if (a.ok) byTheme[a.tema].ok++;
+  });
+
+  const rows = Object.entries(byTheme).map(([tema, v]) => {
+    const p = Math.round((v.ok / v.t) * 100);
+    const cls = p >= 80 ? 'ok' : p >= 50 ? 'mid' : 'no';
+    return `<tr><td>${tema}</td><td class="num">${v.ok}/${v.t}</td>
+            <td class="num"><span class="pill ${cls}">${p}%</span></td></tr>`;
+  }).join('');
+
+  const errors = answers.filter(a => !a.ok);
+  const rev = errors.length
+    ? `<ul class="rev-list">${errors.map(a => {
+        const q = QUIZ[a.i];
+        const corr = q.alternativas.find(x => x.ok);
+        return `<li><b>Questão ${a.i + 1} · ${q.tema}</b>
+                  ${a.chosen === -1 ? 'Você pulou. ' : ''}Correta (${LETTERS[q.alternativas.findIndex(x => x.ok)]}): ${corr.t}</li>`;
+      }).join('')}</ul>`
+    : `<p class="sub" style="margin-top:18px">Nenhum erro. Nesse nível, vale revisar só os detalhes de nomenclatura de radicais (sec-, terc-, iso-) antes da prova.</p>`;
+
+  const msg = pct >= 85 ? 'Muito bom — você domina a classificação de cadeias.'
+            : pct >= 65 ? 'Bom caminho. Os erros estão concentrados em poucos temas: releia a tabela.'
+            : pct >= 45 ? 'Base em construção. Refaça as questões erradas com a explicação ao lado.'
+            : 'Vale voltar à teoria: tetravalência, classificação de carbonos e os três critérios de cadeia.';
+
+  const rr = resumoLog();
+  count.innerHTML = '<b>' + total + '</b> / ' + total;
+
+  stage.innerHTML = `
+    <section class="card">
+      <span class="chip">Resultado</span>
+      ${porTempo ? `<div class="banner">⏱ Tempo esgotado — o simulado foi encerrado e corrigido com as respostas já registradas.</div>` : ''}
+      <div class="score">
+        <div class="ring" style="--p:${pct}"><span>${pct}%</span></div>
+        <div class="score-txt">
+          <h2>${right} de ${total} corretas</h2>
+          <p>${msg}</p>
+        </div>
+      </div>
+      <div class="meta-row">
+        <span>Tentativa: <b>${tentativa}ª</b></span>
+        <span>Tempo: <b>${fmt(segUsados)}</b>${porTempo ? ' (limite)' : ' de 50:00'}</span>
+        <span>Em branco: <b>${semResposta}</b></span>
+        <span>Média por questão: <b>${answers.length >= 3 ? fmt(segUsados / answers.length) : '—'}</b></span>
+        <span>Reinícios + saídas: <b>${rr.reinicios + rr.interrupcoes}</b></span>
+      </div>
+      <table>
+        <thead><tr><th>Tema</th><th class="num">Acertos</th><th class="num">%</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <h3 style="font-size:15px;margin:22px 0 0">Revisar antes da prova</h3>
+      ${rev}
+      <div class="actions">
+        <span class="hint">Cada tentativa sorteia novas posições.</span>
+        <button class="btn ghost" id="inicio" type="button">Tela inicial</button>
+        <button class="btn" id="again" type="button">Refazer o simulado</button>
+      </div>
+    </section>`;
+
+  document.getElementById('again').addEventListener('click', () => comecar(true, 'reiniciou'));
+  document.getElementById('inicio').addEventListener('click', telaInicial);
+  renderLog();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------------- painel de registro ---------------- */
+document.getElementById('logToggle').addEventListener('click', () => {
+  const list = document.getElementById('logList');
+  const foot = document.getElementById('logFoot');
+  const abrir = list.hidden;
+  list.hidden = !abrir;
+  foot.hidden = !abrir || !logGet().length;
+  document.getElementById('logToggle').textContent = abrir ? 'Ocultar' : 'Histórico';
+});
+
+document.getElementById('logClear').addEventListener('click', () => {
+  lsSet(K_LOG, []);
+  renderLog();
+  const list = document.getElementById('logList');
+  list.hidden = true;
+  document.getElementById('logFoot').hidden = true;
+  document.getElementById('logToggle').textContent = 'Histórico';
+});
+
+/* ---------------- aula do assunto (modal) ---------------- */
+let scrollAntes = 0;
+
+function renderLicao(id){
+  const l = LICOES[id];
+  if (!l) return '';
+
+  const corpo = l.blocos.map(b => {
+    if (b.t === 'h')   return `<h3>${b.v}</h3>`;
+    if (b.t === 'p')   return `<p>${b.v}</p>`;
+    if (b.t === 'formula') return `<div class="lesson-form">${b.v}${b.leg ? `<span class="leg">${b.leg}</span>` : ''}</div>`;
+    if (b.t === 'figura') return b.v;
+    if (b.t === 'destaque') return `<div class="lesson-hi">${b.v}</div>`;
+    if (b.t === 'lista') return `<ul>${b.v.map(x => `<li>${x}</li>`).join('')}</ul>`;
+    return '';
+  }).join('');
+
+  const erros = (l.erros && l.erros.length) ? `
+    <div class="lesson-erros">
+      <p class="tit">Onde todo mundo erra</p>
+      <ul>${l.erros.map(x => `<li>${x}</li>`).join('')}</ul>
+    </div>` : '';
+
+  return `
+    <div class="lesson-head">
+      <div style="flex:1;min-width:0">
+        <p class="eyebrow">Aula · Calorimetria</p>
+        <h2>${l.titulo}</h2>
+      </div>
+      <button class="lesson-close" id="fecharAula" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <div class="lesson-body">
+      <p class="lesson-resumo">${l.resumo}</p>
+      ${corpo}
+      ${erros}
+    </div>
+    <div class="lesson-foot">
+      <button class="btn ghost" id="fecharAula2" type="button">Voltar para a questão</button>
+      <button class="btn" id="entendi" type="button">Entendi, continuar</button>
+    </div>`;
+}
+
+function abrirLicao(id){
+  const modal = document.getElementById('modal');
+  const box   = document.getElementById('lesson');
+  if (!modal || !LICOES[id]) return;
+  scrollAntes = window.scrollY;
+  box.innerHTML = renderLicao(id);
+  modal.classList.add('open');
+  modal.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('fecharAula').addEventListener('click', fecharLicao);
+  document.getElementById('fecharAula2').addEventListener('click', fecharLicao);
+  document.getElementById('entendi').addEventListener('click', fecharLicao);
+}
+
+function fecharLicao(){
+  const modal = document.getElementById('modal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('lesson').innerHTML = '';
+  window.scrollTo({top: scrollAntes, behavior: 'auto'});
+  const n = document.getElementById('next');
+  if (n) n.focus({preventScroll:true});
+}
+
+document.addEventListener('click', e => {
+  if (e.target && e.target.id === 'modal') fecharLicao();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    const m = document.getElementById('modal');
+    if (m && m.classList.contains('open')){ e.preventDefault(); e.stopPropagation(); fecharLicao(); }
+  }
+}, true);
+
+/* ---------------- teclado ---------------- */
+document.addEventListener('keydown', e => {
+  const modalAberto = document.getElementById('modal') && document.getElementById('modal').classList.contains('open');
+  if (modalAberto) return;              // aula aberta: teclado do quiz fica inativo
+  if (estado === 'intro'){
+    if (e.key === 'Enter'){ e.preventDefault(); comecar(true); }
+    return;
+  }
+  if (estado !== 'quiz') return;
+  const fb = document.getElementById('fb');
+  if (!fb) return;
+
+  if (fb.dataset.done){
+    if (e.key === 'Enter'){ e.preventDefault(); next(); }
+    return;
+  }
+  if (/^[1-5]$/.test(e.key)){
+    const i = parseInt(e.key, 10) - 1;
+    if (i < QUIZ[idx].alternativas.length){ e.preventDefault(); selecionar(i); }
+    return;
+  }
+  if (e.key === 'Enter' && pendente !== null){ e.preventDefault(); confirmar(); }
+  if (e.key === 'Escape' && pendente !== null){ e.preventDefault(); limparSelecao(); }
+});
+
+/* ---------------- ao sair no meio da tentativa ---------------- */
+window.addEventListener('pagehide', () => { if (estado === 'quiz') marcarSessao(); });
+window.addEventListener('beforeunload', () => { if (estado === 'quiz') marcarSessao(); });
+
+/* ---------------- boot ---------------- */
+registrarSaidaAnterior();
+renderLog();
+telaInicial();
+</script>
+</body>
+</html>
