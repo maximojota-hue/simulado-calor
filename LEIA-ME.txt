@@ -1,5 +1,5 @@
 ﻿SIMULADO DE FISICA - CALORIMETRIA
-2o ano do Ensino Medio - 43 questoes - 50 minutos
+2o ano do Ensino Medio - 49 questoes - 73 min 30 s (1,5 min por questao)
 =================================================
 
 >>> JEITO MAIS FACIL <<<
@@ -11,8 +11,8 @@ clique em "Mais informacoes" e depois em "Executar assim mesmo".
 
 
 >>> O QUE TEM DENTRO <<<
-- 43 questoes de multipla escolha, com gabarito comentado
-- Cronometro de 50 minutos
+- 49 questoes de multipla escolha, com gabarito comentado
+- Cronometro de 73 min 30 s (1,5 minuto por questao)
 - Confirmacao antes de revelar a resposta
 - Registro de tentativas, reinicios e saidas no meio
 - 15 AULAS completas: toda resposta tem um botao
@@ -63,3 +63,4 @@ Use o .bat ou clique com o botao direito > Abrir com > Chrome.
 
 
 Problemas? O .bat precisa estar na MESMA PASTA do simulado.html.
+
